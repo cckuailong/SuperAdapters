@@ -1,0 +1,13 @@
+finetune_old.py
+test.py
+.idea/
+*.pyc
+data/train/
+LLMs/bloom/
+LLMs/chatglm/
+LLMs/open-llama/
+LLMs/vicuna/
+output/bloom/
+output/chatglm/
+output/open-llama/
+venv/
