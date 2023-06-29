@@ -232,6 +232,7 @@ class ChatGLM(LLM):
             ddp_find_unused_parameters=False if self.ddp else None,
             group_by_length=self.group_by_length,
             use_mps_device=self.use_mps_device,
+            report_to=None
         )
 
         trainer = transformers.Trainer(
