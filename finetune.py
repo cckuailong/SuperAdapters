@@ -1,3 +1,5 @@
+import os
+os.environ["WANDB_DISABLED"] = "true"
 import argparse
 from core.chatglm import ChatGLM
 from core.llama import LLAMA

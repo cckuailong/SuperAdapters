@@ -141,4 +141,6 @@ class LLM:
             self.is_fp16 = False
             self.device_map = {"": self.device}
         else:
+            if self.load_8bit:
+                self.is_fp16 = False
             self.device_map = "auto"
