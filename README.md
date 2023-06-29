@@ -17,6 +17,22 @@ You can Finetune LLM on
 
 ## Requirement
 
+CentOS:
+
+```bash
+yum install -y xz-devel
+```
+
+Ubuntu:
+```bash
+apt-get install -y liblzma-dev
+```
+
+MacOS:
+```bash
+brew install xz
+```
+
 If you want to use gpu on Mac, Please read [How to use GPU on Mac](./MacGPUEnv.md)
 
 ```shell

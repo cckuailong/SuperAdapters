@@ -54,7 +54,7 @@ if __name__ == "__main__":
     elif args.model_type == "bloom":
         llm = BLoom()
 
-    llm.data = args.data
+    llm.data_path = args.data
     llm.base_model = args.model_path
     llm.output_dir = args.output_dir
 
