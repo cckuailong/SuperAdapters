@@ -81,9 +81,6 @@ sympy==1.12
 termcolor==2.3.0
 tokenizers==0.13.3
 toolz==0.12.0
-torch==2.1.0.dev20230604
-torchaudio==2.1.0.dev20230604
-torchvision==0.16.0.dev20230604
 tqdm==4.65.0
 transformers==4.29.2
 typing-extensions==4.6.3

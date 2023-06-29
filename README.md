@@ -36,6 +36,7 @@ brew install xz
 If you want to use gpu on Mac, Please read [How to use GPU on Mac](./MacGPUEnv.md)
 
 ```shell
+pip install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
 pip install -r requirements.txt
 ```
 
