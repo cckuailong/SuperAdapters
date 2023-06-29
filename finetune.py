@@ -8,7 +8,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
 
     # base
-    parser.add_argument('--data', type=str, nargs="*", help='the data used for instructing tuning')
+    parser.add_argument('--data', type=str, default="data/train/", help='the data used for instructing tuning')
     parser.add_argument('--model_type', default="llama", choices=['llama', 'chatglm', 'bloom', 'moss'])
     parser.add_argument('--model_path', default="LLMs/open-llama/openllama-3b", type=str)
     parser.add_argument('--output_dir', default="output/", type=str, help="The DIR to save the model")
