@@ -1,4 +1,7 @@
+import os
+import sys
 import argparse
+
 from core.chatglm import ChatGLM
 from core.llama import LLAMA
 from core.bloom import BLoom
@@ -12,6 +15,7 @@ if __name__ == "__main__":
     parser.add_argument('--model_type', default="llama", choices=['llama', 'chatglm', 'bloom', 'moss'])
     parser.add_argument('--model_path', default="LLMs/open-llama/openllama-3b", type=str)
     parser.add_argument('--output_dir', default="output/", type=str, help="The DIR to save the model")
+    parser.add_argument('--disable_wandb', action="store_true", help="Disable report to wandb")
 
     # adapter
     parser.add_argument('--adapter', default="lora", choices=['lora', 'adalora', 'prompt', 'p_tuning', 'prefix'])
@@ -53,10 +57,16 @@ if __name__ == "__main__":
         llm = LLAMA()
     elif args.model_type == "bloom":
         llm = BLoom()
+    else:
+        print("model_type should be chatglm/llama/bloom")
+        sys.exit(-1)
 
     llm.data_path = args.data
     llm.base_model = args.model_path
     llm.output_dir = args.output_dir
+    llm.disable_wandb = args.disable_wandb
+    if llm.disable_wandb:
+        os.environ["WANDB_DISABLED"] = "true"
 
     llm.adapter = args.adapter
     llm.lora_r = args.lora_r

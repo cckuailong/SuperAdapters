@@ -20,6 +20,7 @@ class LLM:
     model_type: str = "chatglm"
     data_path: str = "data/train"
     output_dir: str = "./output"
+    disable_wandb: bool = False
 
     # adapter params
     adapter: str = "prefix"
