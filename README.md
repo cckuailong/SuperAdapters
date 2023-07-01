@@ -9,6 +9,7 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 | Bloom        | ✅  | ✅  | ✅  | ✅  |
 | LLaMA        | ✅  | ✅  | ✅  | ✅  |
 | ChatGLM      | ✅  | ✅  | ✅  | ✅  |
+| ChatGLM2     | ✅  | ✅  | ✅  | ✅  |
 
 You can Finetune LLM on 
 - Windows
@@ -46,8 +47,9 @@ pip install -r requirements.txt
 |--------------| ---- |
 | Bloom        | [https://huggingface.co/bigscience/bloom-560m](https://huggingface.co/bigscience/bloom-560m) |
 | LLaMA        | [https://huggingface.co/openlm-research/open_llama_3b_600bt_preview](https://huggingface.co/openlm-research/open_llama_3b_600bt_preview) |
-| ChatGLM      | [https://huggingface.co/THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b) |
 | Vicuna       | [https://huggingface.co/lmsys/vicuna-7b-delta-v1.1](https://huggingface.co/lmsys/vicuna-7b-delta-v1.1) |
+| ChatGLM      | [https://huggingface.co/THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b) |
+| ChatGLM2      | [https://huggingface.co/THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b) |
 
 ## Usage
 
@@ -102,6 +104,7 @@ optional arguments:
   --model_path MODEL_PATH
   --output_dir OUTPUT_DIR
                         The DIR to save the model
+  --disable_wandb Disable report to wandb
   --adapter {lora,adalora,prompt,p_tuning,prefix}
   --lora_r LORA_R
   --lora_alpha LORA_ALPHA
@@ -144,6 +147,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --instruction INSTRUCTION
   --input INPUT
+  --data The DIR of test data
   --model_type {llama,chatglm,bloom,moss}
   --model_path MODEL_PATH
   --adapter_weights ADAPTER_WEIGHTS

@@ -10,7 +10,8 @@ if __name__ == "__main__":
     # base
     parser.add_argument('--instruction', default="Hello", type=str)
     parser.add_argument('--input', default=None, type=str)
-    parser.add_argument('--model_type', default="llama", choices=['llama', 'chatglm', 'bloom', 'moss'])
+    parser.add_argument('--data', default=None, help="The DIR of test data", type=str)
+    parser.add_argument('--model_type', default="llama", choices=['llama', 'chatglm', 'chatglm2', 'bloom'])
     parser.add_argument('--model_path', default="LLMs/open-llama/openllama-3b", type=str)
     parser.add_argument('--adapter_weights', default="output/llama", type=str, help="The DIR of adapter weights")
 
@@ -24,7 +25,7 @@ if __name__ == "__main__":
 
     args, _ = parser.parse_known_args()
 
-    if args.model_type == "chatglm":
+    if args.model_type == "chatglm" or args.model_type == "chatglm2":
         llm = ChatGLM()
     elif args.model_type == "llama":
         llm = LLAMA()
@@ -41,5 +42,5 @@ if __name__ == "__main__":
     llm.top_k = args.top_k
     llm.max_new_tokens = args.max_new_tokens
 
-    response = llm.generate(args.instruction, args.input)
-    print(response)
+    llm.generate(args.instruction, args.input, args.data)
+

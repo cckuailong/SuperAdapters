@@ -11,3 +11,4 @@ output/bloom/
 output/chatglm/
 output/llama/
 venv/
+wandb/

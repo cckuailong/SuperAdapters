@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     # base
     parser.add_argument('--data', type=str, default="data/train/", help='the data used for instructing tuning')
-    parser.add_argument('--model_type', default="llama", choices=['llama', 'chatglm', 'bloom', 'moss'])
+    parser.add_argument('--model_type', default="llama", choices=['llama', 'chatglm', 'chatglm2', 'bloom'])
     parser.add_argument('--model_path', default="LLMs/open-llama/openllama-3b", type=str)
     parser.add_argument('--output_dir', default="output/", type=str, help="The DIR to save the model")
     parser.add_argument('--disable_wandb', action="store_true", help="Disable report to wandb")
@@ -51,17 +51,18 @@ if __name__ == "__main__":
 
     args, _ = parser.parse_known_args()
 
-    if args.model_type == "chatglm":
+    if args.model_type == "chatglm" or args.model_type == "chatglm2":
         llm = ChatGLM()
     elif args.model_type == "llama":
         llm = LLAMA()
     elif args.model_type == "bloom":
         llm = BLoom()
     else:
-        print("model_type should be chatglm/llama/bloom")
+        print("model_type should be llama/bloom/chatglm/chatglm2")
         sys.exit(-1)
 
     llm.data_path = args.data
+    llm.model_type = args.model_type
     llm.base_model = args.model_path
     llm.output_dir = args.output_dir
     llm.disable_wandb = args.disable_wandb

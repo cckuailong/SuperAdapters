@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import json
 import copy
 import torch
 import transformers
@@ -287,7 +288,7 @@ class BLoom(LLM):
 
         return output.split("### Response:")[1].strip()
 
-    def generate(self, instruction, input):
+    def generate(self, instruction, input, data):
         self.auto_device()
 
         model, self.tokenizer = self.get_model_tokenizer()
@@ -304,11 +305,24 @@ class BLoom(LLM):
         if torch.__version__ >= "2" and sys.platform != "win32":
             model = torch.compile(model)
 
-        response = self.evaluate(model, instruction, input)
-        if response[-4:] == "</s>":
-            response = response[:-4]
+        if data:
+            with open(data, "r") as f:
+                test_items = json.loads(f.read())
+                case = 1
+            for item in test_items:
+                response = self.evaluate(model, item["instruction"], item["input"])
+                if response[-4:] == "</s>":
+                    response = response[:-4]
+                print("[*] Case: {}\n--------\nExpect: \n{}\n----------------\nOutput: \n{}\n".format(case,
+                                                                                                      item["output"],
+                                                                                                      response))
+                case += 1
+        else:
+            response = self.evaluate(model, instruction, input)
+            if response[-4:] == "</s>":
+                response = response[:-4]
 
-        return response
+            print(response)
 
 
 if __name__ == "__main__":
