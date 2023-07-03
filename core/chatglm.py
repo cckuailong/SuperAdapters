@@ -469,9 +469,12 @@ class ChatGLM(LLM):
                 test_items = json.loads(f.read())
                 case = 1
             for item in test_items:
-                response = self.evaluate(model, item["instruction"], item["input"])
-                if response[-4:] == "</s>":
-                    response = response[:-4]
+                try:
+                    response = self.evaluate(model, item["instruction"], item["input"])
+                    if response[-4:] == "</s>":
+                        response = response[:-4]
+                except:
+                    response = "Eval Error"
                 print("[*] Case: {}\n--------\nExpect: \n{}\n----------------\nOutput: \n{}\n".format(case, item["output"], response))
                 case += 1
         else:
