@@ -293,10 +293,11 @@ class BLoom(LLM):
 
         model, self.tokenizer = self.get_model_tokenizer()
 
-        model = PeftModel.from_pretrained(
-            model,
-            self.adapter_weights,
-        )
+        if self.adapter_weights != "None":
+            model = PeftModel.from_pretrained(
+                model,
+                self.adapter_weights,
+            )
 
         if not self.load_8bit:
             model.half()

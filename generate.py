@@ -13,7 +13,7 @@ if __name__ == "__main__":
     parser.add_argument('--data', default=None, help="The DIR of test data", type=str)
     parser.add_argument('--model_type', default="llama", choices=['llama', 'chatglm', 'chatglm2', 'bloom'])
     parser.add_argument('--model_path', default="LLMs/open-llama/openllama-3b", type=str)
-    parser.add_argument('--adapter_weights', default="output/llama", type=str, help="The DIR of adapter weights")
+    parser.add_argument('--adapter_weights', default="None", type=str, help="The DIR of adapter weights")
 
     parser.add_argument('--load_8bit', action="store_true")
 
