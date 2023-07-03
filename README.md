@@ -6,10 +6,10 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 
 | Model        | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  |
 |--------------| ---- | ---- | ---- | ----  |
-| Bloom        | ✅  | ✅  | ✅  | ✅  |
-| LLaMA        | ✅  | ✅  | ✅  | ✅  |
-| ChatGLM      | ✅  | ✅  | ✅  | ✅  |
-| ChatGLM2     | ✅  | ✅  | ✅  | ✅  |
+| Bloom        | ✅ | ✅ | ✅ | ✅ |
+| LLaMA        | ✅ | ✅ | ✅ | ✅ |
+| ChatGLM      | ✅ | ☑️ | ☑️ | ☑️ |
+| ChatGLM2     | ✅ | ☑️ | ☑️ | ☑️ |
 
 You can Finetune LLM on 
 - Windows
