@@ -5,11 +5,11 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 ## Support
 
 | Model        | LoRA | Prefix Tuning  | P-Tuning | Prompt Tuning  |
-|--------------| ---- | ---- | ---- | ----  |
-| Bloom        | ✅ | ✅ | ✅ | ✅ |
-| LLaMA        | ✅ | ✅ | ✅ | ✅ |
-| ChatGLM      | ✅ | ☑️ | ☑️ | ☑️ |
-| ChatGLM2     | ✅ | ☑️ | ☑️ | ☑️ |
+|--------------| ---- | ---- | ---- | ---- |
+| Bloom        | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| LLaMA        | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ChatGLM      | :white_check_mark: | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
+| ChatGLM2     | :white_check_mark: | :ballot_box_with_check: |️ :ballot_box_with_check: | :ballot_box_with_check: |
 
 You can Finetune LLM on 
 - Windows
