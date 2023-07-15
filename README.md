@@ -164,3 +164,5 @@ optional arguments:
 
 - https://github.com/AGI-Edgerunners/LLM-Adapters
 - https://github.com/PhoebusSi/Alpaca-CoT
+- https://transformers.run/
+- https://www.mikecaptain.com/2023/01/22/captain-aigc-1-transformer/

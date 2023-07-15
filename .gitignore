@@ -7,6 +7,7 @@ LLMs/bloom/
 LLMs/chatglm/
 LLMs/open-llama/
 LLMs/vicuna/
+LLMs/UltraLM/
 output/bloom/
 output/chatglm/
 output/llama/
