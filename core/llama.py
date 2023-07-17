@@ -24,7 +24,6 @@ from peft import (
 )
 
 from core.llm import LLM
-from common.db import get_mysql_conn
 
 
 class LLAMA(LLM):
@@ -327,6 +326,7 @@ class LLAMA(LLM):
                                                                                                       response))
                 case += 1
         elif fromdb:
+            from common.db import get_mysql_conn
             conn = get_mysql_conn()
             cur = conn.cursor()
 
