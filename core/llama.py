@@ -330,7 +330,8 @@ class LLAMA(LLM):
             cur = conn.cursor()
 
             sql = "select payload_uuid,instruction,input,output from playbooks where type=%s and iteration=%s"
-            items = cur.execute(sql, (type, iteration))
+            cur.execute(sql, (type, iteration))
+            items = cur.fetchall()
             for item in items:
                 payload_uuid, instruction, input, output = item
                 input = input[:1600]
