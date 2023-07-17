@@ -314,6 +314,7 @@ class LLAMA(LLM):
             with open(data, "r") as f:
                 test_items = json.loads(f.read())
                 case = 1
+            print("Find {} cases".format(len(test_items)))
             for item in test_items:
                 try:
                     response = self.evaluate(model, item["instruction"], item["input"])
@@ -332,6 +333,7 @@ class LLAMA(LLM):
             sql = "select payload_uuid,instruction,input,output from playbooks where type=%s and iteration=%s"
             cur.execute(sql, (type, iteration))
             items = cur.fetchall()
+            print("Find {} cases".format(len(items)))
             for item in items:
                 payload_uuid, instruction, input, output = item
                 input = input[:1600]
