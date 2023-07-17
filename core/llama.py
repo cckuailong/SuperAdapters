@@ -24,6 +24,7 @@ from peft import (
 )
 
 from core.llm import LLM
+from common.db import get_mysql_conn
 
 
 class LLAMA(LLM):
@@ -291,7 +292,7 @@ class LLAMA(LLM):
 
         return output.split("### Response:")[1].strip()
 
-    def generate(self, instruction, input, data):
+    def generate(self, instruction, input, data, fromdb, type, iteration, test_iteration):
         self.auto_device()
 
         model, self.tokenizer = self.get_model_tokenizer()
@@ -324,6 +325,28 @@ class LLAMA(LLM):
                                                                                                       item["output"],
                                                                                                       response))
                 case += 1
+        elif fromdb:
+            conn = get_mysql_conn()
+            cur = conn.cursor()
+
+            sql = "select payload_uuid,instruction,input,output from playbooks where type=%s and iteration=%s"
+            items = cur.execute(sql, (type, iteration))
+            for item in items:
+                payload_uuid, instruction, input, output = item
+                input = input[:1600]
+                try:
+                    response = self.evaluate(model, instruction, input)
+                    if response[-4:] == "</s>":
+                        response = response[:-4]
+                except:
+                    response = "Eval Error"
+
+                sql = "insert into payload_uuid,type,instruction,input,output,ac_output,iteration,test_iteration values(%s,%s,%s,%s,%s,%s,%s,%s)"
+                cur.execute(sql, (payload_uuid, type, instruction, input, output, response, iteration, test_iteration))
+                conn.commit()
+
+            cur.close()
+            conn.close()
         else:
             response = self.evaluate(model, instruction, input)
             if response[-4:] == "</s>":

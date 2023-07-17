@@ -23,6 +23,13 @@ if __name__ == "__main__":
     parser.add_argument('--top_k', default="40", type=int)
     parser.add_argument('--max_new_tokens', default="512", type=int)
 
+    # fromdb
+    parser.add_argument('--fromdb', action="store_true")
+    parser.add_argument('--db_type', default=None, type=str)
+    parser.add_argument('--db_iteration', default=None, type=str)
+    parser.add_argument('--db_test_iteration', default=None, type=str)
+
+
     args, _ = parser.parse_known_args()
 
     if args.model_type == "chatglm" or args.model_type == "chatglm2":
@@ -42,5 +49,5 @@ if __name__ == "__main__":
     llm.top_k = args.top_k
     llm.max_new_tokens = args.max_new_tokens
 
-    llm.generate(args.instruction, args.input, args.data)
+    llm.generate(args.instruction, args.input, args.data, args.fromdb, args.db_type, args.db_iteration, args.db_test_iteration)
 
