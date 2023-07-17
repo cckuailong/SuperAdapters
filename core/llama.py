@@ -341,7 +341,7 @@ class LLAMA(LLM):
                 except:
                     response = "Eval Error"
 
-                sql = "insert into payload_uuid,type,instruction,input,output,ac_output,iteration,test_iteration values(%s,%s,%s,%s,%s,%s,%s,%s)"
+                sql = "insert into result (payload_uuid,type,instruction,input,output,ac_output,iteration,test_iteration) values(%s,%s,%s,%s,%s,%s,%s,%s)"
                 cur.execute(sql, (payload_uuid, type, instruction, input, output, response, iteration, test_iteration))
                 conn.commit()
 
