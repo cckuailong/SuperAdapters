@@ -1,12 +1,9 @@
 import os
 import sys
 import re
-import json
 import copy
 import torch
 import transformers
-
-from datasets import load_dataset
 
 from common.base import IGNORE_INDEX
 from common.prompt import PROMPT_DICT
@@ -127,14 +124,6 @@ class BLoom(LLM):
 
             return tokenized_with_response
 
-    def load_train_data(self):
-        if self.data_path.endswith(".json") or self.data_path.endswith(".jsonl"):
-            data = load_dataset("json", data_files=self.data_path)
-        else:
-            data = load_dataset(self.data_path)
-
-        return data
-
     def split_train_data(self, data):
         if self.val_set_size > 0:
             train_val = data["train"].train_test_split(
@@ -152,7 +141,7 @@ class BLoom(LLM):
 
         return train_data, val_data
 
-    def finetune(self):
+    def finetune(self, fromdb, iteration):
         self.auto_device()
 
         if not self.lora_target_modules:
@@ -166,8 +155,11 @@ class BLoom(LLM):
 
         model = self.load_adapter_config(model)
 
-        data = self.load_train_data()
+        data = self.load_train_data(fromdb, iteration)
         print(data)
+        if not data:
+            print("Warning! Empty Train Data!")
+            return
 
         train_data, val_data = self.split_train_data(data)
 
@@ -288,7 +280,7 @@ class BLoom(LLM):
 
         return output.split("### Response:")[1].strip()
 
-    def generate(self, instruction, input, data):
+    def generate(self, instruction, input, data, fromdb, type, iteration, test_iteration):
         self.auto_device()
 
         model, self.tokenizer = self.get_model_tokenizer()
@@ -306,27 +298,19 @@ class BLoom(LLM):
         if torch.__version__ >= "2" and sys.platform != "win32":
             model = torch.compile(model)
 
-        if data:
-            with open(data, "r") as f:
-                test_items = json.loads(f.read())
-                case = 1
-            for item in test_items:
-                try:
-                    response = self.evaluate(model, item["instruction"], item["input"])
-                    if response[-4:] == "</s>":
-                        response = response[:-4]
-                except:
-                    response = "Eval Error"
-                print("[*] Case: {}\n--------\nExpect: \n{}\n----------------\nOutput: \n{}\n".format(case,
-                                                                                                      item["output"],
-                                                                                                      response))
-                case += 1
-        else:
-            response = self.evaluate(model, instruction, input)
-            if response[-4:] == "</s>":
-                response = response[:-4]
+        eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration)
 
-            print(response)
+        for item in eval_inputs:
+            try:
+                response = self.evaluate(model, item["instruction"], item["input"])
+                if response[-4:] == "</s>":
+                    response = response[:-4]
+            except:
+                response = "Eval Error"
+
+            item["ac_output"] = response
+
+        self.eval_output(eval_inputs, data, fromdb, type, iteration, test_iteration)
 
 
 if __name__ == "__main__":

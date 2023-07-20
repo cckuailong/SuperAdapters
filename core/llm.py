@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import torch
 from peft import (
     AdaLoraConfig,
@@ -12,6 +13,7 @@ from peft import (
 )
 
 from typing import List
+from datasets import load_dataset, Dataset, DatasetDict
 
 
 class LLM:
@@ -145,3 +147,91 @@ class LLM:
             if self.load_8bit:
                 self.is_fp16 = False
             self.device_map = "auto"
+
+    def load_train_data(self, fromdb, s_iteration):
+        data = None
+        if fromdb:
+            train_data_set = []
+
+            from common.db import get_mysql_conn
+            conn = get_mysql_conn()
+            cur = conn.cursor()
+            sql = "select instruction,input,output from playbooks where iteration=%s and `type`='train'"
+            cur.execute(sql, s_iteration)
+            items = cur.fetchall()
+            cur.close()
+            conn.close()
+            for item in items:
+                instruction, input, output = item
+                train_data_set.append({
+                    "instruction": instruction,
+                    "input": input,
+                    "output": output
+                })
+            data = DatasetDict({"train": Dataset.from_list(train_data_set)})
+        elif self.data_path:
+            if self.data_path.endswith(".json") or self.data_path.endswith(".jsonl"):
+                data = load_dataset("json", data_files=self.data_path)
+            else:
+                data = load_dataset(self.data_path)
+
+        return data
+
+    def get_eval_input(self, s_instruction, s_input, s_data, fromdb, s_type, s_iteration):
+        result = []
+        if fromdb:
+            from common.db import get_mysql_conn
+            conn = get_mysql_conn()
+            cur = conn.cursor()
+            sql = "select payload_uuid,instruction,input,output from playbooks where type=%s and iteration=%s"
+            cur.execute(sql, (s_type, s_iteration))
+            items = cur.fetchall()
+            cur.close()
+            conn.close()
+
+            for item in items:
+                payload_uuid, instruction, input, output = item
+                result.append({
+                    "payload_uuid": payload_uuid,
+                    "instruction": instruction,
+                    "input": input,
+                    "output": output
+                })
+        elif s_data:
+            with open(s_data, "r") as f:
+                test_items = json.loads(f.read())
+            result = test_items
+        else:
+            result.append({
+                "instruction": s_instruction,
+                "input": s_input
+            })
+
+        print("Find {} cases".format(len(result)))
+
+        return result
+
+    def eval_output(self, eval_inputs, s_data, fromdb, s_type, s_iteration, s_test_iteration):
+        if fromdb:
+            data_set = []
+            for item in eval_inputs:
+                data_set.append((item["payload_uuid"], s_type, item["instruction"], item["input"], item["output"],
+                                 item["ac_output"], s_iteration, s_test_iteration))
+
+            from common.db import get_mysql_conn
+            conn = get_mysql_conn()
+            cur = conn.cursor()
+            sql = "insert into result (payload_uuid,type,instruction,input,output,ac_output,iteration,test_iteration) values(%s,%s,%s,%s,%s,%s,%s,%s)"
+            cur.executemany(sql, data_set)
+            conn.commit()
+            cur.close()
+            conn.close()
+
+            print("Finish eval!")
+        elif s_data:
+            case_cnt = 0
+            for item in eval_inputs:
+                case_cnt += 1
+                print("[*] Case: {}\n--------\nExpect: \n{}\n----------------\nOutput: \n{}\n".format(case_cnt, item["output"], item["ac_output"]))
+        else:
+            print("LLM says: \n{}".format(eval_inputs[0]["ac_output"]))

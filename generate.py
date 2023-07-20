@@ -25,9 +25,9 @@ if __name__ == "__main__":
 
     # fromdb
     parser.add_argument('--fromdb', action="store_true")
-    parser.add_argument('--db_type', default=None, type=str)
-    parser.add_argument('--db_iteration', default=None, type=str)
-    parser.add_argument('--db_test_iteration', default=None, type=str)
+    parser.add_argument('--db_type', default=None, type=str, help="The record is whether 'train' or 'test'.")
+    parser.add_argument('--db_iteration', default=None, type=str, help="The record's set name.")
+    parser.add_argument('--db_test_iteration', default=None, type=str, help="The record's test set name.")
 
 
     args, _ = parser.parse_known_args()

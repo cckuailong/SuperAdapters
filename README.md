@@ -4,17 +4,23 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 
 ## Support
 
-| Model        | LoRA               | Prefix Tuning           | P-Tuning                | Prompt Tuning           |
-|--------------| ------------------ | ----------------------- | ----------------------- | ----------------------- |
-| Bloom        | :white_check_mark: | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
-| LLaMA        | :white_check_mark: | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
-| ChatGLM      | :white_check_mark: | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
-| ChatGLM2     | :white_check_mark: | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
+| Model    | LoRA               | Prefix Tuning           | P-Tuning                | Prompt Tuning           |
+|----------| ------------------ | ----------------------- | ----------------------- | ----------------------- |
+| Bloom    | :white_check_mark: | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+| LLaMA    | :white_check_mark: | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+| LLaMA2   | :white_check_mark: | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+| ChatGLM  | :white_check_mark: | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
+| ChatGLM2 | :white_check_mark: | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
 
 You can Finetune LLM on 
 - Windows
 - Linux
 - Mac M1/2
+
+You can Handle train / test Data with
+- Terminal
+- File
+- DataBase
 
 ## Requirement
 
@@ -47,9 +53,10 @@ pip install -r requirements.txt
 |--------------| ---- |
 | Bloom        | [https://huggingface.co/bigscience/bloom-560m](https://huggingface.co/bigscience/bloom-560m) |
 | LLaMA        | [https://huggingface.co/openlm-research/open_llama_3b_600bt_preview](https://huggingface.co/openlm-research/open_llama_3b_600bt_preview) |
+| LLaMA2       | [https://huggingface.co/meta-llama/Llama-2-13b-hf](https://huggingface.co/meta-llama/Llama-2-13b-hf) |
 | Vicuna       | [https://huggingface.co/lmsys/vicuna-7b-delta-v1.1](https://huggingface.co/lmsys/vicuna-7b-delta-v1.1) |
 | ChatGLM      | [https://huggingface.co/THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b) |
-| ChatGLM2      | [https://huggingface.co/THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b) |
+| ChatGLM2     | [https://huggingface.co/THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b) |
 
 ## Usage
 
@@ -83,28 +90,67 @@ python finetune.py --model_type bloom --data "data/train/" --model_path "LLMs/bl
 python generate.py --model_type bloom --instruction "Who are you?" --model_path "LLMs/bloom/bloomz-560m" --adapter_weights "output/bloom" --max_new_tokens 256
 ```
 
+### Use DataBase
+
+1. You need to install a MySQL, and put the db config into the system env.
+
+Eg. 
+
+```
+export LLM_DB_HOST='127.0.0.1'
+export LLM_DB_PORT=3306
+export LLM_DB_USERNAME='YOURUSERNAME'
+export LLM_DB_PASSWORD='YOURPASSWORD'
+export LLM_DB_NAME='YOURDBNAME'
+```
+
+2. create the necessary tables
+
+[Here is the sql files](./sql/)
+
+```sql
+source xxxx.sql
+```
+
+- db_iteration: [train/test] The record's set name.
+- db_type: [test] The record is whether "train" or "test".
+- db_test_iteration: [test] The record's test set name.
+
+3. finetune (use chatglm for example)
+
+```shell
+python finetune.py --model_type chatglm --fromdb --db_iteration xxxxxx --model_path "LLMs/chatglm/chatglm-6b/" --adapter "lora" --output_dir "output/chatglm" --disable_wandb
+```
+
+4. eval
+
+```shell
+python generate.py --model_type chatglm --fromdb --db_iteration xxxxxx --db_type 'test' --db_test_iteration yyyyyyy --model_path "LLMs/chatglm/chatglm-6b/" --adapter_weights "output/chatglm" --max_new_tokens 6
+```
+
+
 ## Params
 
 ### Finetune
 
 ```shell
-usage: finetune.py [-h] [--data [DATA [DATA ...]]] [--model_type {llama,chatglm,bloom,moss}] [--model_path MODEL_PATH] [--output_dir OUTPUT_DIR] [--adapter {lora,adalora,prompt,p_tuning,prefix}]
+usage: finetune.py [-h] [--data DATA] [--model_type {llama,chatglm,chatglm2,bloom}] [--model_path MODEL_PATH] [--output_dir OUTPUT_DIR] [--disable_wandb] [--adapter {lora,adalora,prompt,p_tuning,prefix}]
                    [--lora_r LORA_R] [--lora_alpha LORA_ALPHA] [--lora_dropout LORA_DROPOUT] [--lora_target_modules LORA_TARGET_MODULES [LORA_TARGET_MODULES ...]] [--adalora_init_r ADALORA_INIT_R]
                    [--adalora_tinit ADALORA_TINIT] [--adalora_tfinal ADALORA_TFINAL] [--adalora_delta_t ADALORA_DELTA_T] [--num_virtual_tokens NUM_VIRTUAL_TOKENS] [--mapping_hidden_dim MAPPING_HIDDEN_DIM]
                    [--epochs EPOCHS] [--learning_rate LEARNING_RATE] [--cutoff_len CUTOFF_LEN] [--val_set_size VAL_SET_SIZE] [--group_by_length] [--logging_steps LOGGING_STEPS] [--load_8bit]
                    [--add_eos_token] [--resume_from_checkpoint [RESUME_FROM_CHECKPOINT]] [--per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE] [--gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS]
+                   [--fromdb] [--db_iteration DB_ITERATION]
 
 Process some integers.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --data [DATA [DATA ...]]
-                        the data used for instructing tuning
-  --model_type {llama,chatglm,bloom,moss}
+  --data DATA           the data used for instructing tuning
+  --model_type {llama,chatglm,chatglm2,bloom}
   --model_path MODEL_PATH
   --output_dir OUTPUT_DIR
                         The DIR to save the model
-  --disable_wandb Disable report to wandb
+  --disable_wandb       Disable report to wandb
   --adapter {lora,adalora,prompt,p_tuning,prefix}
   --lora_r LORA_R
   --lora_alpha LORA_ALPHA
@@ -133,13 +179,17 @@ optional arguments:
   --per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE
                         Batch size per GPU/CPU for training.
   --gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS
+  --fromdb
+  --db_iteration DB_ITERATION
+                        The record's set name.
 ```
 
 ## Generate
 
 ```shell
-usage: generate.py [-h] [--instruction INSTRUCTION] [--input INPUT] [--model_type {llama,chatglm,bloom,moss}] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit]
-                   [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K] [--max_new_tokens MAX_NEW_TOKENS]
+usage: generate.py [-h] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,chatglm,chatglm2,bloom}] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit]
+                   [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K] [--max_new_tokens MAX_NEW_TOKENS] [--fromdb] [--db_type DB_TYPE] [--db_iteration DB_ITERATION]
+                   [--db_test_iteration DB_TEST_ITERATION]
 
 Process some integers.
 
@@ -147,8 +197,8 @@ optional arguments:
   -h, --help            show this help message and exit
   --instruction INSTRUCTION
   --input INPUT
-  --data The DIR of test data
-  --model_type {llama,chatglm,bloom,moss}
+  --data DATA           The DIR of test data
+  --model_type {llama,chatglm,chatglm2,bloom}
   --model_path MODEL_PATH
   --adapter_weights ADAPTER_WEIGHTS
                         The DIR of adapter weights
@@ -158,6 +208,12 @@ optional arguments:
   --top_p TOP_P
   --top_k TOP_K
   --max_new_tokens MAX_NEW_TOKENS
+  --fromdb
+  --db_type DB_TYPE     The record is whether 'train' or 'test'.
+  --db_iteration DB_ITERATION
+                        The record's set name.
+  --db_test_iteration DB_TEST_ITERATION
+                        The record's test set name.
 ```
 
 ## Reference

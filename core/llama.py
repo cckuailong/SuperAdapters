@@ -1,12 +1,9 @@
 import os
 import sys
 import re
-import json
 import copy
 import torch
 import transformers
-
-from datasets import load_dataset
 
 from common.base import IGNORE_INDEX
 from common.prompt import PROMPT_DICT
@@ -129,14 +126,6 @@ class LLAMA(LLM):
 
             return tokenized_with_response
 
-    def load_train_data(self):
-        if self.data_path.endswith(".json") or self.data_path.endswith(".jsonl"):
-            data = load_dataset("json", data_files=self.data_path)
-        else:
-            data = load_dataset(self.data_path)
-
-        return data
-
     def split_train_data(self, data):
         if self.val_set_size > 0:
             train_val = data["train"].train_test_split(
@@ -154,7 +143,7 @@ class LLAMA(LLM):
 
         return train_data, val_data
 
-    def finetune(self):
+    def finetune(self, fromdb, iteration):
         self.auto_device()
 
         if not self.lora_target_modules:
@@ -169,8 +158,11 @@ class LLAMA(LLM):
 
         model = self.load_adapter_config(model)
 
-        data = self.load_train_data()
+        data = self.load_train_data(fromdb, iteration)
         print(data)
+        if not data:
+            print("Warning! Empty Train Data!")
+            return
 
         train_data, val_data = self.split_train_data(data)
 
@@ -309,53 +301,19 @@ class LLAMA(LLM):
         if torch.__version__ >= "2" and sys.platform != "win32":
             model = torch.compile(model)
 
-        if data:
-            with open(data, "r") as f:
-                test_items = json.loads(f.read())
-                case = 1
-            print("Find {} cases".format(len(test_items)))
-            for item in test_items:
-                try:
-                    response = self.evaluate(model, item["instruction"], item["input"])
-                    if response[-4:] == "</s>":
-                        response = response[:-4]
-                except:
-                    response = "Eval Error"
-                print("[*] Case: {}\n--------\nExpect: \n{}\n----------------\nOutput: \n{}\n".format(case,
-                                                                                                      item["output"],
-                                                                                                      response))
-                case += 1
-        elif fromdb:
-            from common.db import get_mysql_conn
-            conn = get_mysql_conn()
-            cur = conn.cursor()
+        eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration)
 
-            sql = "select payload_uuid,instruction,input,output from playbooks where type=%s and iteration=%s"
-            cur.execute(sql, (type, iteration))
-            items = cur.fetchall()
-            print("Find {} cases".format(len(items)))
-            for item in items:
-                payload_uuid, instruction, input, output = item
-                input = input[:1600]
-                try:
-                    response = self.evaluate(model, instruction, input)
-                    if response[-4:] == "</s>":
-                        response = response[:-4]
-                except:
-                    response = "Eval Error"
+        for item in eval_inputs:
+            try:
+                response = self.evaluate(model, item["instruction"], item["input"])
+                if response[-4:] == "</s>":
+                    response = response[:-4]
+            except:
+                response = "Eval Error"
 
-                sql = "insert into result (payload_uuid,type,instruction,input,output,ac_output,iteration,test_iteration) values(%s,%s,%s,%s,%s,%s,%s,%s)"
-                cur.execute(sql, (payload_uuid, type, instruction, input, output, response, iteration, test_iteration))
-                conn.commit()
+            item["ac_output"] = response
 
-            cur.close()
-            conn.close()
-        else:
-            response = self.evaluate(model, instruction, input)
-            if response[-4:] == "</s>":
-                response = response[:-4]
-
-            print(response)
+        self.eval_output(eval_inputs, data, fromdb, type, iteration, test_iteration)
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ data/train/
 LLMs/bloom/
 LLMs/chatglm/
 LLMs/open-llama/
+LLMs/llama2/
 LLMs/vicuna/
 LLMs/UltraLM/
 output/bloom/

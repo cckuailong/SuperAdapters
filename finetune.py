@@ -49,6 +49,9 @@ if __name__ == "__main__":
     parser.add_argument('--per_gpu_train_batch_size', default=4, type=int, help='Batch size per GPU/CPU for training.')
     parser.add_argument('--gradient_accumulation_steps', default=32, type=int)
 
+    parser.add_argument('--fromdb', action="store_true")
+    parser.add_argument('--db_iteration', default=None, type=str, help="The record's set name.")
+
     args, _ = parser.parse_known_args()
 
     if args.model_type == "chatglm" or args.model_type == "chatglm2":
@@ -94,4 +97,8 @@ if __name__ == "__main__":
     llm.per_gpu_train_batch_size = args.per_gpu_train_batch_size
     llm.gradient_accumulation_steps = args.gradient_accumulation_steps
 
-    llm.finetune()
+    if not os.path.exists(llm.output_dir):
+        os.makedirs(llm.output_dir)
+        print("Warning: Directory {} Not Found, create automatically")
+
+    llm.finetune(args.fromdb, args.db_iteration)
