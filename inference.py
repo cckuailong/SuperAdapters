@@ -5,7 +5,7 @@ from core.bloom import BLoom
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='Inference for all.')
 
     # base
     parser.add_argument('--instruction', default="Hello", type=str)

@@ -8,7 +8,7 @@ from core.bloom import BLoom
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='Finetune for all.')
 
     # base
     parser.add_argument('--data', type=str, default="data/train/", help='the data used for instructing tuning')

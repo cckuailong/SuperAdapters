@@ -67,7 +67,7 @@ python finetune.py --model_type chatglm --data "data/train/" --model_path "LLMs/
 ```
 
 ```bash
-python generate.py --model_type chatglm --instruction "Who are you?" --model_path "LLMs/chatglm/chatglm-6b/" --adapter_weights "output/chatglm" --max_new_tokens 256
+python inference.py --model_type chatglm --instruction "Who are you?" --model_path "LLMs/chatglm/chatglm-6b/" --adapter_weights "output/chatglm" --max_new_tokens 256
 ```
 
 ### LLaMa with lora
@@ -77,7 +77,7 @@ python finetune.py --model_type llama --data "data/train/" --model_path "LLMs/op
 ```
 
 ```bash
-python generate.py --model_type llama --instruction "Who are you?" --model_path "LLMs/open-llama/open-llama-3b" --adapter_weights "output/llama" --max_new_tokens 256
+python inference.py --model_type llama --instruction "Who are you?" --model_path "LLMs/open-llama/open-llama-3b" --adapter_weights "output/llama" --max_new_tokens 256
 ```
 
 ### Bloom with lora
@@ -87,7 +87,7 @@ python finetune.py --model_type bloom --data "data/train/" --model_path "LLMs/bl
 ```
 
 ```bash
-python generate.py --model_type bloom --instruction "Who are you?" --model_path "LLMs/bloom/bloomz-560m" --adapter_weights "output/bloom" --max_new_tokens 256
+python inference.py --model_type bloom --instruction "Who are you?" --model_path "LLMs/bloom/bloomz-560m" --adapter_weights "output/bloom" --max_new_tokens 256
 ```
 
 ### Use DataBase
@@ -125,7 +125,7 @@ python finetune.py --model_type chatglm --fromdb --db_iteration xxxxxx --model_p
 4. eval
 
 ```shell
-python generate.py --model_type chatglm --fromdb --db_iteration xxxxxx --db_type 'test' --db_test_iteration yyyyyyy --model_path "LLMs/chatglm/chatglm-6b/" --adapter_weights "output/chatglm" --max_new_tokens 6
+python inference.py --model_type chatglm --fromdb --db_iteration xxxxxx --db_type 'test' --db_test_iteration yyyyyyy --model_path "LLMs/chatglm/chatglm-6b/" --adapter_weights "output/chatglm" --max_new_tokens 6
 ```
 
 
@@ -141,7 +141,7 @@ usage: finetune.py [-h] [--data DATA] [--model_type {llama,chatglm,chatglm2,bloo
                    [--add_eos_token] [--resume_from_checkpoint [RESUME_FROM_CHECKPOINT]] [--per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE] [--gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS]
                    [--fromdb] [--db_iteration DB_ITERATION]
 
-Process some integers.
+Finetune for all.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -187,11 +187,11 @@ optional arguments:
 ## Generate
 
 ```shell
-usage: generate.py [-h] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,chatglm,chatglm2,bloom}] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit]
+usage: inference.py [-h] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,chatglm,chatglm2,bloom}] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit]
                    [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K] [--max_new_tokens MAX_NEW_TOKENS] [--fromdb] [--db_type DB_TYPE] [--db_iteration DB_ITERATION]
                    [--db_test_iteration DB_TEST_ITERATION]
 
-Process some integers.
+Inference for all.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -215,6 +215,24 @@ optional arguments:
   --db_test_iteration DB_TEST_ITERATION
                         The record's test set name.
 ```
+
+## Label Web
+
+### Classify
+
+```shell
+python web/label.py
+```
+
+![](media/label_web_1.png)
+
+### Chat
+
+```shell
+python web/label.py --type chat
+```
+
+![](media/label_web_2.png)
 
 ## Reference
 
