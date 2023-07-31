@@ -13,18 +13,15 @@ def get_flow():
     payload_uuid = None
     input = None
     output = None
-    cnt = 3
     conn.ping(reconnect=True)
     cur = conn.cursor()
-    while cnt > 0:
-        sql = "select payload_uuid,input,output from playbooks_all where is_check=0"
-        cur.execute(sql)
-        item = cur.fetchone()
-        if item:
-            payload_uuid, input, output = item
-            break
-        else:
-            cnt -= 1
+    sql = "select payload_uuid,input,output from playbooks_all where is_check=0"
+    cur.execute(sql)
+    item = cur.fetchone()
+    if item:
+        payload_uuid, input, output = item
+    else:
+        payload_uuid, input, output = None, None, None
     cur.close()
 
     return payload_uuid, input, output
@@ -33,38 +30,54 @@ def get_flow():
 def passit(uuid):
     conn.ping(reconnect=True)
     cur = conn.cursor()
-    sql = "update playbooks_all set is_check=1 where payload_uuid=%s"
-    cur.execute(sql, uuid)
-    conn.commit()
+    try:
+        sql = "update playbooks_all set is_check=1 where payload_uuid=%s"
+        cur.execute(sql, uuid)
+        conn.commit()
+    except:
+        pass
     cur.close()
 
     payload_uuid, pb_input, pb_output = get_flow()
 
-    return payload_uuid, pb_input, pb_output
+    if not payload_uuid:
+        payload_uuid = "暂无待标注流量"
 
+    return payload_uuid, pb_input, pb_output
 
 def fixit(uuid, ac_output):
     conn.ping(reconnect=True)
     cur = conn.cursor()
-    sql = "update playbooks_all set is_check=2, output=%s where payload_uuid=%s"
-    cur.execute(sql, (ac_output, uuid))
-    conn.commit()
+    try:
+        sql = "update playbooks_all set is_check=2, output=%s where payload_uuid=%s"
+        cur.execute(sql, (ac_output, uuid))
+        conn.commit()
+    except:
+        pass
     cur.close()
 
     payload_uuid, pb_input, pb_output = get_flow()
 
-    return payload_uuid, pb_input, pb_output
+    if not payload_uuid:
+        payload_uuid = "暂无待标注流量"
 
+    return payload_uuid, pb_input, pb_output
 
 def deleteit(uuid):
     conn.ping(reconnect=True)
     cur = conn.cursor()
-    sql = "update playbooks_all set is_check=-1 where payload_uuid=%s"
-    cur.execute(sql, uuid)
-    conn.commit()
+    try:
+        sql = "update playbooks_all set is_check=-1 where payload_uuid=%s"
+        cur.execute(sql, uuid)
+        conn.commit()
+    except:
+        pass
     cur.close()
 
     payload_uuid, pb_input, pb_output = get_flow()
+
+    if not payload_uuid:
+        payload_uuid = "暂无待标注流量"
 
     return payload_uuid, pb_input, pb_output
 
@@ -97,7 +110,6 @@ with gr.Blocks() as demo:
                 fixBtn = gr.Button("FixIt!", variant="primary")
                 passBtn = gr.Button("Correct! Pass")
             delBtn = gr.Button("Delete the Flow", variant="stop")
-
 
     fixBtn.click(fixit, inputs=[g_payload_uuid, g_pb_output], outputs=[g_payload_uuid, g_pb_input, g_pb_output])
     passBtn.click(passit, inputs=[g_payload_uuid], outputs=[g_payload_uuid, g_pb_input, g_pb_output])
