@@ -21,6 +21,7 @@ class LLM:
     base_model: str = "LLMs/chatglm/chatglm-6b"
     model_type: str = "chatglm"
     data_path: str = "data/train"
+    labels: list = ["0", "1"]
     output_dir: str = "./output"
     disable_wandb: bool = False
 

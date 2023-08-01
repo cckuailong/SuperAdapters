@@ -1,7 +1,12 @@
+import sys
 import argparse
-from core.chatglm import ChatGLM
-from core.llama import LLAMA
-from core.bloom import BLoom
+
+from core.seq2seq.chatglm import ChatGLMSeq2Seq
+from core.seq2seq.llama import LLAMASeq2Seq
+from core.seq2seq.bloom import BLoomSeq2Seq
+
+from core.classify.llama import LLAMAClassify
+from core.classify.bloom import BLoomClassify
 
 
 if __name__ == "__main__":
@@ -12,6 +17,9 @@ if __name__ == "__main__":
     parser.add_argument('--input', default=None, type=str)
     parser.add_argument('--data', default=None, help="The DIR of test data", type=str)
     parser.add_argument('--model_type', default="llama", choices=['llama', 'chatglm', 'chatglm2', 'bloom'])
+    parser.add_argument('--task_type', default="seq2seq", choices=['seq2seq', 'classify'])
+    parser.add_argument('--labels', default="[\"0\", \"1\"]",
+                        help="Labels to classify, only used when task_type is classify")
     parser.add_argument('--model_path', default="LLMs/open-llama/openllama-3b", type=str)
     parser.add_argument('--adapter_weights', default="None", type=str, help="The DIR of adapter weights")
 
@@ -32,12 +40,27 @@ if __name__ == "__main__":
 
     args, _ = parser.parse_known_args()
 
-    if args.model_type == "chatglm" or args.model_type == "chatglm2":
-        llm = ChatGLM()
-    elif args.model_type == "llama":
-        llm = LLAMA()
-    elif args.model_type == "bloom":
-        llm = BLoom()
+    if args.task_type == "seq2seq":
+        if args.model_type == "chatglm" or args.model_type == "chatglm2":
+            llm = ChatGLMSeq2Seq()
+        elif args.model_type == "llama":
+            llm = LLAMASeq2Seq()
+        elif args.model_type == "bloom":
+            llm = BLoomSeq2Seq()
+        else:
+            print("model_type should be llama/bloom/chatglm/chatglm2")
+            sys.exit(-1)
+    elif args.task_type == "classify":
+        if args.model_type == "chatglm" or args.model_type == "chatglm2":
+            print("Classify with ChatGLM is not support now.")
+            sys.exit(-1)
+        elif args.model_type == "llama":
+            llm = LLAMAClassify()
+        elif args.model_type == "bloom":
+            llm = BLoomClassify()
+        else:
+            print("model_type should be llama/bloom/chatglm/chatglm2")
+            sys.exit(-1)
 
     llm.base_model = args.model_path
     llm.adapter_weights = args.adapter_weights

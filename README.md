@@ -12,15 +12,19 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 | ChatGLM  | :white_check_mark: | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
 | ChatGLM2 | :white_check_mark: | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
 
-You can Finetune LLM on 
+**You can Finetune LLM on** 
 - Windows
 - Linux
 - Mac M1/2
 
-You can Handle train / test Data with
+**You can Handle train / test Data with**
 - Terminal
 - File
 - DataBase
+
+**You can Do various Task**
+- CausalLM (default)
+- SequenceClassification
 
 ## Requirement
 
@@ -88,6 +92,18 @@ python finetune.py --model_type bloom --data "data/train/" --model_path "LLMs/bl
 
 ```bash
 python inference.py --model_type bloom --instruction "Who are you?" --model_path "LLMs/bloom/bloomz-560m" --adapter_weights "output/bloom" --max_new_tokens 256
+```
+
+### Use Classify Mode
+
+You need to specify task_type('classify') and labels
+
+```bash
+python finetune.py --model_type llama --data "data/train/alpaca_tiny_classify.json" --model_path "LLMs/open-llama/open-llama-3b" --adapter "lora" --output_dir "output/llama" --task_type classify --labels '["0", "1"]' --disable_wandb
+```
+
+```bash
+python inference.py --model_type llama --data "data/train/alpaca_tiny_classify.json" --model_path "LLMs/open-llama/open-llama-3b" --adapter_weights "output/llama" --task_type classify --labels '["0", "1"]' --disable_wandb
 ```
 
 ### Use DataBase

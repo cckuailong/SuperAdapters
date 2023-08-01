@@ -9,8 +9,8 @@ from common.base import IGNORE_INDEX
 from common.prompt import PROMPT_DICT
 
 from transformers import (
-    LlamaForCausalLM,
-    LlamaTokenizer,
+    BloomTokenizerFast,
+    BloomForCausalLM,
     GenerationConfig
 )
 
@@ -23,22 +23,20 @@ from peft import (
 from core.llm import LLM
 
 
-class LLAMA(LLM):
+class BLoomSeq2Seq(LLM):
     tokenizer = None
 
     def get_model_tokenizer(self):
-        model = LlamaForCausalLM.from_pretrained(
+        model = BloomForCausalLM.from_pretrained(
             self.base_model,
             load_in_8bit=self.load_8bit,
             device_map=self.device_map,
             low_cpu_mem_usage=True
         )
-        tokenizer = LlamaTokenizer.from_pretrained(
+        tokenizer = BloomTokenizerFast.from_pretrained(
             self.base_model,
             add_eos_token=self.add_eos_token
         )  # default add_eos_token=False
-
-        tokenizer.pad_token_id = 0
 
         return model, tokenizer
 
@@ -148,8 +146,7 @@ class LLAMA(LLM):
 
         if not self.lora_target_modules:
             self.lora_target_modules = [
-                "q_proj",
-                "v_proj"
+                "query_key_value"
             ]
 
         model, self.tokenizer = self.get_model_tokenizer()
@@ -317,5 +314,5 @@ class LLAMA(LLM):
 
 
 if __name__ == "__main__":
-    llama = LLAMA()
-    llama.finetune()
+    bloom = BLoomSeq2Seq()
+    bloom.finetune()
