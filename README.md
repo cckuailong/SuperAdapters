@@ -150,12 +150,13 @@ python inference.py --model_type chatglm --fromdb --db_iteration xxxxxx --db_typ
 ### Finetune
 
 ```shell
-usage: finetune.py [-h] [--data DATA] [--model_type {llama,chatglm,chatglm2,bloom}] [--model_path MODEL_PATH] [--output_dir OUTPUT_DIR] [--disable_wandb] [--adapter {lora,adalora,prompt,p_tuning,prefix}]
-                   [--lora_r LORA_R] [--lora_alpha LORA_ALPHA] [--lora_dropout LORA_DROPOUT] [--lora_target_modules LORA_TARGET_MODULES [LORA_TARGET_MODULES ...]] [--adalora_init_r ADALORA_INIT_R]
-                   [--adalora_tinit ADALORA_TINIT] [--adalora_tfinal ADALORA_TFINAL] [--adalora_delta_t ADALORA_DELTA_T] [--num_virtual_tokens NUM_VIRTUAL_TOKENS] [--mapping_hidden_dim MAPPING_HIDDEN_DIM]
-                   [--epochs EPOCHS] [--learning_rate LEARNING_RATE] [--cutoff_len CUTOFF_LEN] [--val_set_size VAL_SET_SIZE] [--group_by_length] [--logging_steps LOGGING_STEPS] [--load_8bit]
-                   [--add_eos_token] [--resume_from_checkpoint [RESUME_FROM_CHECKPOINT]] [--per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE] [--gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS]
-                   [--fromdb] [--db_iteration DB_ITERATION]
+usage: finetune.py [-h] [--data DATA] [--model_type {llama,chatglm,chatglm2,bloom}] [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH] [--output_dir OUTPUT_DIR] [--disable_wandb]
+                   [--adapter {lora,adalora,prompt,p_tuning,prefix}] [--lora_r LORA_R] [--lora_alpha LORA_ALPHA] [--lora_dropout LORA_DROPOUT]
+                   [--lora_target_modules LORA_TARGET_MODULES [LORA_TARGET_MODULES ...]] [--adalora_init_r ADALORA_INIT_R] [--adalora_tinit ADALORA_TINIT] [--adalora_tfinal ADALORA_TFINAL]
+                   [--adalora_delta_t ADALORA_DELTA_T] [--num_virtual_tokens NUM_VIRTUAL_TOKENS] [--mapping_hidden_dim MAPPING_HIDDEN_DIM] [--epochs EPOCHS] [--learning_rate LEARNING_RATE]
+                   [--cutoff_len CUTOFF_LEN] [--val_set_size VAL_SET_SIZE] [--group_by_length] [--logging_steps LOGGING_STEPS] [--load_8bit] [--add_eos_token]
+                   [--resume_from_checkpoint [RESUME_FROM_CHECKPOINT]] [--per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE] [--gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS] [--fromdb]
+                   [--db_iteration DB_ITERATION]
 
 Finetune for all.
 
@@ -163,6 +164,8 @@ optional arguments:
   -h, --help            show this help message and exit
   --data DATA           the data used for instructing tuning
   --model_type {llama,chatglm,chatglm2,bloom}
+  --task_type {seq2seq,classify}
+  --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH
   --output_dir OUTPUT_DIR
                         The DIR to save the model
@@ -203,9 +206,9 @@ optional arguments:
 ## Generate
 
 ```shell
-usage: inference.py [-h] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,chatglm,chatglm2,bloom}] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit]
-                   [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K] [--max_new_tokens MAX_NEW_TOKENS] [--fromdb] [--db_type DB_TYPE] [--db_iteration DB_ITERATION]
-                   [--db_test_iteration DB_TEST_ITERATION]
+usage: inference.py [-h] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,chatglm,chatglm2,bloom}] [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH]
+                    [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit] [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K] [--max_new_tokens MAX_NEW_TOKENS] [--fromdb] [--db_type DB_TYPE]
+                    [--db_iteration DB_ITERATION] [--db_test_iteration DB_TEST_ITERATION]
 
 Inference for all.
 
@@ -215,6 +218,8 @@ optional arguments:
   --input INPUT
   --data DATA           The DIR of test data
   --model_type {llama,chatglm,chatglm2,bloom}
+  --task_type {seq2seq,classify}
+  --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH
   --adapter_weights ADAPTER_WEIGHTS
                         The DIR of adapter weights
