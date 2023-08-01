@@ -103,9 +103,9 @@ def calc():
     cur.close()
 
     return pd.DataFrame([{
-        "剩余数量": remain_cnt,
-        "已修改": fix_cnt,
-        "已审查": pass_cnt
+        "Remain": remain_cnt,
+        "Fixed": fix_cnt,
+        "Checked": pass_cnt
     }])
 
 
