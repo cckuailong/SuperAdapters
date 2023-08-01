@@ -5,6 +5,7 @@ sys.path.insert(0, parentdir)
 import json
 import argparse
 import gradio as gr
+import pandas as pd
 from common.db import get_mysql_conn
 from common.base import WEB_USERNAME, WEB_PASSWORD
 
@@ -24,7 +25,9 @@ def get_flow():
         payload_uuid, input, output = None, None, None
     cur.close()
 
-    return payload_uuid, input, output
+    df = calc()
+
+    return payload_uuid, input, output, df
 
 
 def passit(uuid):
@@ -38,12 +41,12 @@ def passit(uuid):
         pass
     cur.close()
 
-    payload_uuid, pb_input, pb_output = get_flow()
+    payload_uuid, pb_input, pb_output, df = get_flow()
 
     if not payload_uuid:
         payload_uuid = "暂无待标注流量"
 
-    return payload_uuid, pb_input, pb_output
+    return payload_uuid, pb_input, pb_output, df
 
 def fixit(uuid, ac_output):
     conn.ping(reconnect=True)
@@ -56,12 +59,12 @@ def fixit(uuid, ac_output):
         pass
     cur.close()
 
-    payload_uuid, pb_input, pb_output = get_flow()
+    payload_uuid, pb_input, pb_output, df = get_flow()
 
     if not payload_uuid:
         payload_uuid = "暂无待标注流量"
 
-    return payload_uuid, pb_input, pb_output
+    return payload_uuid, pb_input, pb_output, df
 
 def deleteit(uuid):
     conn.ping(reconnect=True)
@@ -74,12 +77,36 @@ def deleteit(uuid):
         pass
     cur.close()
 
-    payload_uuid, pb_input, pb_output = get_flow()
+    payload_uuid, pb_input, pb_output, df = get_flow()
 
     if not payload_uuid:
         payload_uuid = "暂无待标注流量"
 
-    return payload_uuid, pb_input, pb_output
+    return payload_uuid, pb_input, pb_output, df
+
+
+def calc():
+    conn.ping(reconnect=True)
+    cur = conn.cursor()
+    sql = "select count(*) from playbooks_all where is_check=0"
+    cur.execute(sql)
+    remain_cnt = cur.fetchone()[0]
+
+    sql = "select count(*) from playbooks_all where is_check=1"
+    cur.execute(sql)
+    pass_cnt = cur.fetchone()[0]
+
+    sql = "select count(*) from playbooks_all where is_check=2"
+    cur.execute(sql)
+    fix_cnt = cur.fetchone()[0]
+
+    cur.close()
+
+    return pd.DataFrame([{
+        "剩余数量": remain_cnt,
+        "已修改": fix_cnt,
+        "已审查": pass_cnt
+    }])
 
 
 parser = argparse.ArgumentParser(description='Label all.')
@@ -88,7 +115,7 @@ parser.add_argument('--choice', type=str, default='["0", "1"]', help='choices to
 args, _ = parser.parse_known_args()
 
 conn = get_mysql_conn()
-payload_uuid, pb_input, pb_output = get_flow()
+payload_uuid, pb_input, pb_output, df = get_flow()
 
 with gr.Blocks() as demo:
     gr.HTML("""<h1 align="center">SuperAdapters -- Label Web</h1>""")
@@ -98,6 +125,7 @@ with gr.Blocks() as demo:
             g_payload_uuid = gr.Textbox(label="UUID", value=payload_uuid)
             g_pb_input = gr.TextArea(label="Input", value=pb_input)
         with gr.Column(scale=1):
+            g_df = gr.Dataframe(df)
             if args.type == "classify":
                 g_pb_output = gr.Radio(label="Output", choices=json.loads(args.choice), value=pb_output,
                                        interactive=True)
@@ -111,9 +139,9 @@ with gr.Blocks() as demo:
                 passBtn = gr.Button("Correct! Pass")
             delBtn = gr.Button("Delete the Flow", variant="stop")
 
-    fixBtn.click(fixit, inputs=[g_payload_uuid, g_pb_output], outputs=[g_payload_uuid, g_pb_input, g_pb_output])
-    passBtn.click(passit, inputs=[g_payload_uuid], outputs=[g_payload_uuid, g_pb_input, g_pb_output])
-    delBtn.click(deleteit, inputs=[g_payload_uuid], outputs=[g_payload_uuid, g_pb_input, g_pb_output])
+    fixBtn.click(fixit, inputs=[g_payload_uuid, g_pb_output], outputs=[g_payload_uuid, g_pb_input, g_pb_output, g_df])
+    passBtn.click(passit, inputs=[g_payload_uuid], outputs=[g_payload_uuid, g_pb_input, g_pb_output, g_df])
+    delBtn.click(deleteit, inputs=[g_payload_uuid], outputs=[g_payload_uuid, g_pb_input, g_pb_output, g_df])
 
 
 if os.getenv("DEBUG"):
