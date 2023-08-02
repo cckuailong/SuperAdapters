@@ -16,7 +16,7 @@ def get_flow():
     output = None
     conn.ping(reconnect=True)
     cur = conn.cursor()
-    sql = "select payload_uuid,input,output from playbooks_all where is_check=0"
+    sql = "select payload_uuid,input,output from playbooks_all where is_check=0 limit 1"
     cur.execute(sql)
     item = cur.fetchone()
     if item:
