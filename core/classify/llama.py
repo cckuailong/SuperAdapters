@@ -33,7 +33,9 @@ class LLAMAClassify(LLM):
             add_eos_token=self.add_eos_token
         )  # default add_eos_token=False
 
-        tokenizer.pad_token_id = 0
+        # Some Models do not have pad_token
+        if tokenizer.pad_token is None:
+            tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
 
         return model, tokenizer
 

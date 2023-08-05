@@ -9,8 +9,8 @@ from common.base import IGNORE_INDEX
 from common.prompt import PROMPT_DICT
 
 from transformers import (
-    LlamaForCausalLM,
-    LlamaTokenizer,
+    AutoModelForCausalLM,
+    AutoTokenizer,
     GenerationConfig
 )
 
@@ -23,18 +23,20 @@ from peft import (
 from core.llm import LLM
 
 
-class LLAMASeq2Seq(LLM):
+class QwenSeq2Seq(LLM):
     tokenizer = None
 
     def get_model_tokenizer(self):
-        model = LlamaForCausalLM.from_pretrained(
+        model = AutoModelForCausalLM.from_pretrained(
             self.base_model,
             load_in_8bit=self.load_8bit,
             device_map=self.device_map,
-            low_cpu_mem_usage=True
+            low_cpu_mem_usage=True,
+            trust_remote_code=True
         )
-        tokenizer = LlamaTokenizer.from_pretrained(
+        tokenizer = AutoTokenizer.from_pretrained(
             self.base_model,
+            trust_remote_code=True,
             add_eos_token=self.add_eos_token
         )  # default add_eos_token=False
 
@@ -64,6 +66,7 @@ class LLAMASeq2Seq(LLM):
             #    padding="max_length",
             padding=False,
             return_tensors=None,
+            allowed_special="all"
         )
 
         return {
@@ -148,15 +151,17 @@ class LLAMASeq2Seq(LLM):
     def finetune(self, fromdb, iteration):
         self.auto_device()
 
-        if not self.lora_target_modules:
-            self.lora_target_modules = [
-                "q_proj",
-                "v_proj"
-            ]
-
         model, self.tokenizer = self.get_model_tokenizer()
         if self.load_8bit:
             model = prepare_model_for_int8_training(model)
+
+        if not self.lora_target_modules:
+            self.lora_target_modules = [
+                "w1",
+                "w2",
+                "c_proj",
+                "c_attn"
+            ]
 
         model = self.load_adapter_config(model)
 
@@ -319,5 +324,5 @@ class LLAMASeq2Seq(LLM):
 
 
 if __name__ == "__main__":
-    llama = LLAMASeq2Seq()
+    llama = QwenSeq2Seq()
     llama.finetune()

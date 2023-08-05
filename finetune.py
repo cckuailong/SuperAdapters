@@ -6,6 +6,7 @@ import json
 from core.seq2seq.chatglm import ChatGLMSeq2Seq
 from core.seq2seq.llama import LLAMASeq2Seq
 from core.seq2seq.bloom import BLoomSeq2Seq
+from core.seq2seq.qwen import QwenSeq2Seq
 
 from core.classify.llama import LLAMAClassify
 from core.classify.bloom import BLoomClassify
@@ -16,7 +17,7 @@ if __name__ == "__main__":
 
     # base
     parser.add_argument('--data', type=str, default="data/train/", help='the data used for instructing tuning')
-    parser.add_argument('--model_type', default="llama", choices=['llama', 'chatglm', 'chatglm2', 'bloom'])
+    parser.add_argument('--model_type', default="llama", choices=['llama', 'chatglm', 'chatglm2', 'bloom', "qwen"])
     parser.add_argument('--task_type', default="seq2seq", choices=['seq2seq', 'classify'])
     parser.add_argument('--labels', default="[\"0\", \"1\"]", help="Labels to classify, only used when task_type is classify")
     parser.add_argument('--model_path', default="LLMs/open-llama/openllama-3b", type=str)
@@ -67,8 +68,10 @@ if __name__ == "__main__":
             llm = LLAMASeq2Seq()
         elif args.model_type == "bloom":
             llm = BLoomSeq2Seq()
+        elif args.model_type == "qwen":
+            llm = QwenSeq2Seq()
         else:
-            print("model_type should be llama/bloom/chatglm/chatglm2")
+            print("model_type should be llama/bloom/chatglm/chatglm2/qwen")
             sys.exit(-1)
     elif args.task_type == "classify":
         if args.model_type == "chatglm" or args.model_type == "chatglm2":
@@ -78,6 +81,9 @@ if __name__ == "__main__":
             llm = LLAMAClassify()
         elif args.model_type == "bloom":
             llm = BLoomClassify()
+        elif args.model_type == "qwen":
+            print("Classify with Qwen is not support now.")
+            sys.exit(-1)
         else:
             print("model_type should be llama/bloom/chatglm/chatglm2")
             sys.exit(-1)

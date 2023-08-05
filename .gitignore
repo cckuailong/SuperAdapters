@@ -9,8 +9,11 @@ LLMs/open-llama/
 LLMs/llama2/
 LLMs/vicuna/
 LLMs/UltraLM/
+LLMs/Qwen/
 output/bloom/
 output/chatglm/
 output/llama/
+output/Qwen/
 venv/
 wandb/
+web/label_inner.py

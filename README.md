@@ -5,12 +5,13 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 ## Support
 
 | Model    | LoRA               | Prefix Tuning           | P-Tuning                | Prompt Tuning           |
-|----------| ------------------ | ----------------------- | ----------------------- | ----------------------- |
+|----------| ------------------ |-------------------------|-------------------------|-------------------------|
 | Bloom    | :white_check_mark: | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | LLaMA    | :white_check_mark: | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | LLaMA2   | :white_check_mark: | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | ChatGLM  | :white_check_mark: | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
 | ChatGLM2 | :white_check_mark: | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
+| Qwen     | :white_check_mark: | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 
 **You can Finetune LLM on** 
 - Windows
@@ -53,14 +54,15 @@ pip install -r requirements.txt
 
 ## LLMs
 
-| Model        | Download Link |
-|--------------| ---- |
-| Bloom        | [https://huggingface.co/bigscience/bloom-560m](https://huggingface.co/bigscience/bloom-560m) |
-| LLaMA        | [https://huggingface.co/openlm-research/open_llama_3b_600bt_preview](https://huggingface.co/openlm-research/open_llama_3b_600bt_preview) |
-| LLaMA2       | [https://huggingface.co/meta-llama/Llama-2-13b-hf](https://huggingface.co/meta-llama/Llama-2-13b-hf) |
-| Vicuna       | [https://huggingface.co/lmsys/vicuna-7b-delta-v1.1](https://huggingface.co/lmsys/vicuna-7b-delta-v1.1) |
-| ChatGLM      | [https://huggingface.co/THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b) |
-| ChatGLM2     | [https://huggingface.co/THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b) |
+| Model    | Download Link |
+|----------| ---- |
+| Bloom    | [https://huggingface.co/bigscience/bloom-560m](https://huggingface.co/bigscience/bloom-560m) |
+| LLaMA    | [https://huggingface.co/openlm-research/open_llama_3b_600bt_preview](https://huggingface.co/openlm-research/open_llama_3b_600bt_preview) |
+| LLaMA2   | [https://huggingface.co/meta-llama/Llama-2-13b-hf](https://huggingface.co/meta-llama/Llama-2-13b-hf) |
+| Vicuna   | [https://huggingface.co/lmsys/vicuna-7b-delta-v1.1](https://huggingface.co/lmsys/vicuna-7b-delta-v1.1) |
+| ChatGLM  | [https://huggingface.co/THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b) |
+| ChatGLM2 | [https://huggingface.co/THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b) |
+| Qwen     | [https://huggingface.co/Qwen/Qwen-7B-Chat](https://huggingface.co/Qwen/Qwen-7B-Chat) |
 
 ## Usage
 
@@ -92,6 +94,16 @@ python finetune.py --model_type bloom --data "data/train/" --model_path "LLMs/bl
 
 ```bash
 python inference.py --model_type bloom --instruction "Who are you?" --model_path "LLMs/bloom/bloomz-560m" --adapter_weights "output/bloom" --max_new_tokens 256
+```
+
+### Bloom with Qwen
+
+```bash
+python finetune.py --model_type qwen --data "data/train/" --model_path "LLMs/Qwen/Qwen-7b-chat" --adapter "lora" --output_dir "output/Qwen"
+```
+
+```bash
+python inference.py --model_type qwen --instruction "Who are you?" --model_path "LLMs/Qwen/Qwen-7b-chat" --adapter_weights "output/Qwen" --max_new_tokens 256
 ```
 
 ### Use Classify Mode
