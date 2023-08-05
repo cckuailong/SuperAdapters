@@ -96,7 +96,7 @@ python finetune.py --model_type bloom --data "data/train/" --model_path "LLMs/bl
 python inference.py --model_type bloom --instruction "Who are you?" --model_path "LLMs/bloom/bloomz-560m" --adapter_weights "output/bloom" --max_new_tokens 256
 ```
 
-### Bloom with Qwen
+### Qwen with lora
 
 ```bash
 python finetune.py --model_type qwen --data "data/train/" --model_path "LLMs/Qwen/Qwen-7b-chat" --adapter "lora" --output_dir "output/Qwen"
@@ -175,7 +175,7 @@ Finetune for all.
 optional arguments:
   -h, --help            show this help message and exit
   --data DATA           the data used for instructing tuning
-  --model_type {llama,chatglm,chatglm2,bloom}
+  --model_type {llama,chatglm,chatglm2,bloom,qwen}
   --task_type {seq2seq,classify}
   --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH
@@ -229,7 +229,7 @@ optional arguments:
   --instruction INSTRUCTION
   --input INPUT
   --data DATA           The DIR of test data
-  --model_type {llama,chatglm,chatglm2,bloom}
+  --model_type {llama,chatglm,chatglm2,bloom,qwen}
   --task_type {seq2seq,classify}
   --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH
