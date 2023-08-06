@@ -66,10 +66,21 @@ class LLAMAClassify(LLM):
         self.auto_device()
 
         if not self.lora_target_modules:
-            self.lora_target_modules = [
-                "q_proj",
-                "v_proj"
-            ]
+            if self.model_type == "llama2":
+                self.lora_target_modules = [
+                    "q_proj",
+                    "v_proj",
+                    "k_proj",
+                    "o_proj",
+                    "gate_proj",
+                    "down_proj",
+                    "up_proj"
+                ]
+            else:
+                self.lora_target_modules = [
+                    "q_proj",
+                    "v_proj"
+                ]
 
         model, self.tokenizer = self.get_model_tokenizer()
         if self.load_8bit:
