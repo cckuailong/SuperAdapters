@@ -84,7 +84,7 @@ class LLM:
             t_type = TaskType.SEQ_CLS
         else:
             t_type = TaskType.CAUSAL_LM
-        if self.adapter == "lora":
+        if self.adapter == "lora" or self.adapter == "qlora":
             config = LoraConfig(
                 task_type=t_type,
                 r=self.lora_r,

@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parser.add_argument('--disable_wandb', action="store_true", help="Disable report to wandb")
 
     # adapter
-    parser.add_argument('--adapter', default="lora", choices=['lora', 'adalora', 'prompt', 'p_tuning', 'prefix'])
+    parser.add_argument('--adapter', default="lora", choices=['lora', 'qlora', 'adalora', 'prompt', 'p_tuning', 'prefix'])
     parser.add_argument('--lora_r', default=8, type=int)
     parser.add_argument('--lora_alpha', default=16, type=int)
     parser.add_argument('--lora_dropout', default=0.05, type=float)
@@ -126,5 +126,9 @@ if __name__ == "__main__":
     if not os.path.exists(llm.output_dir):
         os.makedirs(llm.output_dir)
         print("Warning: Directory {} Not Found, create automatically")
+
+    if llm.adapter == "qlora" and sys.platform == "darwin":
+        print("Unfortunately, SuperAdapters do not support qlora on Mac, please use lora/adalora instead")
+        sys.exit(-1)
 
     llm.finetune(args.fromdb, args.db_iteration)
