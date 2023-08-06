@@ -20,6 +20,7 @@ class LLM:
     # base params
     base_model: str = "LLMs/chatglm/chatglm-6b"
     model_type: str = "chatglm"
+    task_type: str = "seq2seq"
     data_path: str = "data/train"
     labels: list = ["0", "1"]
     output_dir: str = "./output"
@@ -77,9 +78,15 @@ class LLM:
     max_new_tokens: int = 512
 
     def load_adapter_config(self, model):
+        if self.task_type == "seq2seq":
+            t_type = TaskType.CAUSAL_LM
+        elif self.task_type == "classify":
+            t_type = TaskType.SEQ_CLS
+        else:
+            t_type = TaskType.CAUSAL_LM
         if self.adapter == "lora":
             config = LoraConfig(
-                task_type=TaskType.CAUSAL_LM,
+                task_type=t_type,
                 r=self.lora_r,
                 lora_alpha=self.lora_alpha,
                 lora_dropout=self.lora_dropout,
@@ -89,7 +96,7 @@ class LLM:
             )
         elif self.adapter == 'adalora':
             config = AdaLoraConfig(
-                task_type=TaskType.CAUSAL_LM,
+                task_type=t_type,
                 init_r=self.adalora_init_r,
                 r=self.lora_r,
                 beta1=0.85,
@@ -104,20 +111,20 @@ class LLM:
             )
         elif self.adapter == "prefix":
             config = PrefixTuningConfig(
-                task_type=TaskType.CAUSAL_LM,
+                task_type=t_type,
                 num_virtual_tokens=self.num_virtual_tokens,
                 encoder_hidden_size=self.mapping_hidden_dim,
                 prefix_projection=True
             )
         elif self.adapter == "p_tuning":
             config = PromptEncoderConfig(
-                task_type=TaskType.CAUSAL_LM,
+                task_type=t_type,
                 num_virtual_tokens=self.num_virtual_tokens,
                 encoder_hidden_size=self.mapping_hidden_dim
             )
         elif self.adapter == "prompt":
             config = PromptTuningConfig(
-                task_type=TaskType.CAUSAL_LM,
+                task_type=t_type,
                 num_virtual_tokens=self.num_virtual_tokens
             )
         else:
