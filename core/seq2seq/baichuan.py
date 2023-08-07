@@ -9,8 +9,8 @@ from common.base import IGNORE_INDEX
 from common.prompt import PROMPT_DICT
 
 from transformers import (
-    LlamaForCausalLM,
-    LlamaTokenizer,
+    AutoModelForCausalLM,
+    AutoTokenizer,
     GenerationConfig,
     BitsAndBytesConfig
 )
@@ -24,7 +24,7 @@ from peft import (
 from core.llm import LLM
 
 
-class LLAMASeq2Seq(LLM):
+class BaichuanSeq2Seq(LLM):
     tokenizer = None
 
     def get_model_tokenizer(self):
@@ -36,7 +36,7 @@ class LLAMASeq2Seq(LLM):
                 bnb_4bit_compute_dtype=torch.float16
             )
 
-        model = LlamaForCausalLM.from_pretrained(
+        model = AutoModelForCausalLM.from_pretrained(
             self.base_model,
             load_in_8bit=self.load_8bit,
             device_map=self.device_map,
@@ -44,7 +44,7 @@ class LLAMASeq2Seq(LLM):
             quantization_config=bnb_config,
             trust_remote_code=True,
         )
-        tokenizer = LlamaTokenizer.from_pretrained(
+        tokenizer = AutoTokenizer.from_pretrained(
             self.base_model,
             trust_remote_code=True,
             add_eos_token=self.add_eos_token
@@ -161,21 +161,9 @@ class LLAMASeq2Seq(LLM):
         self.auto_device()
 
         if not self.lora_target_modules:
-            if self.model_type == "llama2":
-                self.lora_target_modules = [
-                    "q_proj",
-                    "v_proj",
-                    "k_proj",
-                    "o_proj",
-                    "gate_proj",
-                    "down_proj",
-                    "up_proj"
-                ]
-            else:
-                self.lora_target_modules = [
-                    "q_proj",
-                    "v_proj"
-                ]
+            self.lora_target_modules = [
+                "W_pack"
+            ]
 
         model, self.tokenizer = self.get_model_tokenizer()
         if self.load_8bit:
@@ -342,5 +330,5 @@ class LLAMASeq2Seq(LLM):
 
 
 if __name__ == "__main__":
-    llama = LLAMASeq2Seq()
-    llama.finetune()
+    bc = BaichuanSeq2Seq()
+    bc.finetune()

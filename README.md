@@ -12,6 +12,7 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 | ChatGLM  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
 | ChatGLM2 | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
 | Qwen     | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+| Baichuan | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 
 **You can Finetune LLM on** 
 - Windows
@@ -106,6 +107,16 @@ python finetune.py --model_type qwen --data "data/train/" --model_path "LLMs/Qwe
 
 ```bash
 python inference.py --model_type qwen --instruction "Who are you?" --model_path "LLMs/Qwen/Qwen-7b-chat" --adapter_weights "output/Qwen" --max_new_tokens 256
+```
+
+### Baichuan with lora
+
+```bash
+python finetune.py --model_type baichuan --data "data/train/" --model_path "LLMs/baichuan/baichuan-7b" --adapter "lora" --output_dir "output/baichuan"
+```
+
+```bash
+python inference.py --model_type baichuan --instruction "Who are you?" --model_path "LLMs/baichuan/baichuan-7b" --adapter_weights "output/baichuan" --max_new_tokens 256
 ```
 
 ### Use Classify Mode
