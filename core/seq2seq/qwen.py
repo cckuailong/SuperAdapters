@@ -49,9 +49,9 @@ class QwenSeq2Seq(LLM):
             add_eos_token=self.add_eos_token
         )  # default add_eos_token=False
 
-        # Some Models like Qwen do not have pad_token
-        if tokenizer.pad_token is None:
-            tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
+        tokenizer.pad_token_id = tokenizer.eod_id
+        tokenizer.bos_token_id = tokenizer.eod_id
+        tokenizer.eos_token_id = tokenizer.eod_id
 
         return model, tokenizer
 

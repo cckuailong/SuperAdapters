@@ -50,10 +50,6 @@ class LLAMASeq2Seq(LLM):
             add_eos_token=self.add_eos_token
         )  # default add_eos_token=False
 
-        # Some Models like Qwen do not have pad_token
-        if tokenizer.pad_token is None:
-            tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
-
         return model, tokenizer
 
     def generate_prompt(self, data_point):
