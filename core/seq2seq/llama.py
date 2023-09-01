@@ -42,13 +42,15 @@ class LLAMASeq2Seq(LLM):
             device_map=self.device_map,
             low_cpu_mem_usage=True,
             quantization_config=bnb_config,
-            trust_remote_code=True,
         )
         tokenizer = LlamaTokenizer.from_pretrained(
             self.base_model,
-            trust_remote_code=True,
             add_eos_token=self.add_eos_token
         )  # default add_eos_token=False
+
+        # Some Models do not have pad_token
+        if tokenizer.pad_token is None:
+            tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
 
         return model, tokenizer
 

@@ -40,11 +40,9 @@ class BLoomClassify(LLM):
             device_map=self.device_map,
             low_cpu_mem_usage=True,
             quantization_config=bnb_config,
-            trust_remote_code=True,
         )
         tokenizer = BloomTokenizerFast.from_pretrained(
             self.base_model,
-            trust_remote_code=True,
             add_eos_token=self.add_eos_token
         )  # default add_eos_token=False
 
