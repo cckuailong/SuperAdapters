@@ -76,7 +76,7 @@ python finetune.py --model_type chatglm --data "data/train/" --model_path "LLMs/
 ```
 
 ```bash
-python inference.py --model_type chatglm --instruction "Who are you?" --model_path "LLMs/chatglm/chatglm-6b/" --adapter_weights "output/chatglm" --max_new_tokens 256
+python inference.py --model_type chatglm --instruction "Who are you?" --model_path "LLMs/chatglm/chatglm-6b/" --adapter_weights "output/chatglm" --max_new_tokens 32
 ```
 
 ### LLaMa with lora
@@ -86,7 +86,7 @@ python finetune.py --model_type llama --data "data/train/" --model_path "LLMs/op
 ```
 
 ```bash
-python inference.py --model_type llama --instruction "Who are you?" --model_path "LLMs/open-llama/open-llama-3b" --adapter_weights "output/llama" --max_new_tokens 256
+python inference.py --model_type llama --instruction "Who are you?" --model_path "LLMs/open-llama/open-llama-3b" --adapter_weights "output/llama" --max_new_tokens 32
 ```
 
 ### Bloom with lora
@@ -96,7 +96,7 @@ python finetune.py --model_type bloom --data "data/train/" --model_path "LLMs/bl
 ```
 
 ```bash
-python inference.py --model_type bloom --instruction "Who are you?" --model_path "LLMs/bloom/bloomz-560m" --adapter_weights "output/bloom" --max_new_tokens 256
+python inference.py --model_type bloom --instruction "Who are you?" --model_path "LLMs/bloom/bloomz-560m" --adapter_weights "output/bloom" --max_new_tokens 32
 ```
 
 ### Qwen with lora
@@ -106,7 +106,7 @@ python finetune.py --model_type qwen --data "data/train/" --model_path "LLMs/Qwe
 ```
 
 ```bash
-python inference.py --model_type qwen --instruction "Who are you?" --model_path "LLMs/Qwen/Qwen-7b-chat" --adapter_weights "output/Qwen" --max_new_tokens 256
+python inference.py --model_type qwen --instruction "Who are you?" --model_path "LLMs/Qwen/Qwen-7b-chat" --adapter_weights "output/Qwen" --max_new_tokens 32
 ```
 
 ### Baichuan with lora
@@ -116,7 +116,7 @@ python finetune.py --model_type baichuan --data "data/train/" --model_path "LLMs
 ```
 
 ```bash
-python inference.py --model_type baichuan --instruction "Who are you?" --model_path "LLMs/baichuan/baichuan-7b" --adapter_weights "output/baichuan" --max_new_tokens 256
+python inference.py --model_type baichuan --instruction "Who are you?" --model_path "LLMs/baichuan/baichuan-7b" --adapter_weights "output/baichuan" --max_new_tokens 32
 ```
 
 ### Use Classify Mode
@@ -239,6 +239,7 @@ Inference for all.
 
 optional arguments:
   -h, --help            show this help message and exit
+  --debug               Debug Mode to output detail info
   --instruction INSTRUCTION
   --input INPUT
   --data DATA           The DIR of test data

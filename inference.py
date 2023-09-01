@@ -14,6 +14,9 @@ from core.classify.bloom import BLoomClassify
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Inference for all.')
 
+    # system
+    parser.add_argument('--debug', action="store_true", help="Debug Mode to output detail info")
+
     # base
     parser.add_argument('--instruction', default="Hello", type=str)
     parser.add_argument('--input', default=None, type=str)
@@ -73,6 +76,8 @@ if __name__ == "__main__":
         else:
             print("model_type should be llama/llama2/bloom/chatglm/chatglm2/qwen/baichuan")
             sys.exit(-1)
+
+    llm.debug = args.debug
 
     llm.base_model = args.model_path
     llm.adapter_weights = args.adapter_weights

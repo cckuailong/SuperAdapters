@@ -199,7 +199,12 @@ class LLAMAClassify(LLM):
         eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration)
 
         for item in eval_inputs:
-            response = self.evaluate(model, item["input"])
+            try:
+                response = self.evaluate(model, item["input"])
+            except Exception as e:
+                if self.debug:
+                    print("[DEBUG] Error: " + str(e))
+                response = "Eval Error"
 
             item["ac_output"] = response
 

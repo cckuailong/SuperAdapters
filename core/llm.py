@@ -17,6 +17,9 @@ from datasets import load_dataset, Dataset, DatasetDict
 
 
 class LLM:
+    # system
+    debug: bool = False
+
     # base params
     base_model: str = "LLMs/chatglm/chatglm-6b"
     model_type: str = "chatglm"

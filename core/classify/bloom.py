@@ -192,7 +192,9 @@ class BLoomClassify(LLM):
                 response = self.evaluate(model, item["input"])
                 if response[-4:] == "</s>":
                     response = response[:-4]
-            except:
+            except Exception as e:
+                if self.debug:
+                    print("[DEBUG] Error: " + str(e))
                 response = "Eval Error"
 
             item["ac_output"] = response
