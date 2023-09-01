@@ -67,6 +67,10 @@ pip install -r requirements.txt
 | ChatGLM2 | [https://huggingface.co/THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b) |
 | Qwen     | [https://huggingface.co/Qwen/Qwen-7B-Chat](https://huggingface.co/Qwen/Qwen-7B-Chat) |
 
+## Finetune Data Format
+
+[Here is an example](data/train/example.json)
+
 ## Usage
 
 ### ChatGLM with lora
