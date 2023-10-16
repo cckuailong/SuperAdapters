@@ -189,7 +189,7 @@ class LLAMAClassify(LLM):
                 self.adapter_weights,
             )
 
-        if not self.load_8bit:
+        if not self.load_8bit and self.device != "cpu":
             model.half()
 
         model.to(self.device).eval()
