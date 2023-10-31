@@ -48,6 +48,12 @@ MacOS:
 brew install xz
 ```
 
+*P.S. Maybe you should recompile the python with xz* 
+
+```bash
+CPPFLAGS="-I$(brew --prefix xz)/include" pyenv install 3.10.0
+```
+
 If you want to use gpu on Mac, Please read [How to use GPU on Mac](./MacGPUEnv.md)
 
 ```shell
