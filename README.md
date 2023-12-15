@@ -13,6 +13,8 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 | ChatGLM2 | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
 | Qwen     | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | Baichuan | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+| Mistrial | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+| Phi      | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 
 **You can Finetune LLM on** 
 - Windows
@@ -72,6 +74,8 @@ pip install -r requirements.txt
 | ChatGLM  | [https://huggingface.co/THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b) |
 | ChatGLM2 | [https://huggingface.co/THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b) |
 | Qwen     | [https://huggingface.co/Qwen/Qwen-7B-Chat](https://huggingface.co/Qwen/Qwen-7B-Chat) |
+| Mistrial | [https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) |
+| Phi      | [https://huggingface.co/microsoft/phi-2](https://huggingface.co/microsoft/phi-2) |
 
 ## Finetune Data Format
 
@@ -127,6 +131,26 @@ python finetune.py --model_type baichuan --data "data/train/" --model_path "LLMs
 
 ```bash
 python inference.py --model_type baichuan --instruction "Who are you?" --model_path "LLMs/baichuan/baichuan-7b" --adapter_weights "output/baichuan" --max_new_tokens 32
+```
+
+### Mistrial with lora
+
+```bash
+python finetune.py --model_type mistrial --data "data/train/" --model_path "LLMs/mistrial/mistrial-7b" --adapter "lora" --output_dir "output/mistrial"
+```
+
+```bash
+python inference.py --model_type mistrial --instruction "Who are you?" --model_path "LLMs/mistrial/mistrial-7b" --adapter_weights "output/mistrial" --max_new_tokens 32
+```
+
+### Phi with lora
+
+```bash
+python finetune.py --model_type phi --data "data/train/" --model_path "LLMs/phi/phi-2" --adapter "lora" --output_dir "output/phi"
+```
+
+```bash
+python inference.py --model_type phi --instruction "Who are you?" --model_path "LLMs/phi/phi-2" --adapter_weights "output/phi" --max_new_tokens 32
 ```
 
 ### Use Classify Mode
@@ -198,7 +222,7 @@ Finetune for all.
 optional arguments:
   -h, --help            show this help message and exit
   --data DATA           the data used for instructing tuning
-  --model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan}
+  --model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mistrial,phi}
   --task_type {seq2seq,classify}
   --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH
@@ -241,8 +265,8 @@ optional arguments:
 ## Generate
 
 ```shell
-usage: inference.py [-h] [--debug] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan}] [--task_type {seq2seq,classify}]
-                    [--labels LABELS] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit] [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K]
+usage: inference.py [-h] [--debug] [--web] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mistrial,phi}]
+                    [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit] [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K]
                     [--max_new_tokens MAX_NEW_TOKENS] [--fromdb] [--db_type DB_TYPE] [--db_iteration DB_ITERATION] [--db_test_iteration DB_TEST_ITERATION]
 
 Inference for all.
@@ -250,10 +274,11 @@ Inference for all.
 optional arguments:
   -h, --help            show this help message and exit
   --debug               Debug Mode to output detail info
+  --web                 Web Demo to try the inference
   --instruction INSTRUCTION
   --input INPUT
   --data DATA           The DIR of test data
-  --model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan}
+  --model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mistrial,phi}
   --task_type {seq2seq,classify}
   --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH
@@ -272,6 +297,16 @@ optional arguments:
   --db_test_iteration DB_TEST_ITERATION
                         The record's test set name.
 ```
+
+## Inference Web
+
+Add the "--web" parameter
+
+```shell
+python inference.py --model_type phi --instruction "Who are you?" --model_path "LLMs/phi/phi-2" --adapter_weights "output/phi" --max_new_tokens 10 --web
+```
+
+![](media/inference_web.png)
 
 ## Label Web
 

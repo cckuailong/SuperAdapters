@@ -24,7 +24,7 @@ from peft import (
 from core.llm import LLM
 
 
-class QwenSeq2Seq(LLM):
+class PhiSeq2Seq(LLM):
     tokenizer = None
 
     def get_model_tokenizer(self):
@@ -40,18 +40,17 @@ class QwenSeq2Seq(LLM):
             load_in_8bit=self.load_8bit,
             device_map=self.device_map,
             low_cpu_mem_usage=True,
+            quantization_config=bnb_config,
             trust_remote_code=True,
-            quantization_config=bnb_config
         )
         tokenizer = AutoTokenizer.from_pretrained(
             self.base_model,
             trust_remote_code=True,
-            add_eos_token=self.add_eos_token
-        )  # default add_eos_token=False
+        )
 
-        tokenizer.pad_token_id = tokenizer.eod_id
-        tokenizer.bos_token_id = tokenizer.eod_id
-        tokenizer.eos_token_id = tokenizer.eod_id
+        # Some Models like Qwen do not have pad_token
+        if tokenizer.pad_token is None:
+            tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
 
         return model, tokenizer
 
@@ -75,7 +74,6 @@ class QwenSeq2Seq(LLM):
             #    padding="max_length",
             padding=False,
             return_tensors=None,
-            allowed_special="all"
         )
 
         return {
@@ -160,17 +158,15 @@ class QwenSeq2Seq(LLM):
     def finetune(self, fromdb, iteration):
         self.auto_device()
 
+        if not self.lora_target_modules:
+            self.lora_target_modules = [
+                "Wqkv",
+                "out_proj"
+            ]
+
         model, self.tokenizer = self.get_model_tokenizer()
         if self.load_8bit:
             model = prepare_model_for_int8_training(model)
-
-        if not self.lora_target_modules:
-            self.lora_target_modules = [
-                "w1",
-                "w2",
-                "c_proj",
-                "c_attn"
-            ]
 
         model = self.load_adapter_config(model)
 
@@ -274,30 +270,29 @@ class QwenSeq2Seq(LLM):
                  **kwargs,
                  ):
         prompt = self.generate_eval_prompt(instruction, input)
-        inputs = self.tokenizer(prompt, return_tensors="pt")
+        inputs = self.tokenizer(prompt, return_tensors="pt", return_attention_mask=False)
         input_ids = inputs["input_ids"].to(self.device)
-        generation_config = GenerationConfig(
-            temperature=self.temperature,
-            top_p=self.top_p,
-            top_k=self.top_k,
-            num_beams=4,
-            do_sample=True,
-            no_repeat_ngram_size=6,
-            repetition_penalty=1.8,
-            **kwargs,
-        )
+        # generation_config = GenerationConfig(
+        #     temperature=self.temperature,
+        #     top_p=self.top_p,
+        #     top_k=self.top_k,
+        #     num_beams=4,
+        #     do_sample=True,
+        #     no_repeat_ngram_size=6,
+        #     repetition_penalty=1.8,
+        #     **kwargs,
+        # )
         with torch.no_grad():
             generation_output = model.generate(
                 input_ids=input_ids,
-                generation_config=generation_config,
-                return_dict_in_generate=True,
-                output_scores=True,
+                # generation_config=generation_config,
+                # return_dict_in_generate=True,
+                # output_scores=True,
                 max_new_tokens=self.max_new_tokens,
             )
-        s = generation_output.sequences[0]
-        output = self.tokenizer.decode(s)
+        output = self.tokenizer.batch_decode(generation_output)[0]
 
-        return output.split("### Response:")[1].strip()
+        return output.split("### Response:")[1].split("<|endoftext|>")[0].strip()
 
     def load_model(self):
         self.auto_device()
@@ -343,5 +338,5 @@ class QwenSeq2Seq(LLM):
 
 
 if __name__ == "__main__":
-    llama = QwenSeq2Seq()
-    llama.finetune()
+    p = PhiSeq2Seq()
+    p.finetune()

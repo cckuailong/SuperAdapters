@@ -10,11 +10,15 @@ LLMs/vicuna/
 LLMs/UltraLM/
 LLMs/Qwen/
 LLMs/baichuan/
+LLMs/mistrial/
+LLMs/phi/
 output/bloom/
 output/chatglm/
 output/llama/
 output/Qwen/
 output/baichuan/
+output/mistrial/
+output/phi/
 venv/
 wandb/
 web/label_inner.py

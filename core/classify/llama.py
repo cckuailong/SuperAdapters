@@ -206,7 +206,10 @@ class LLAMAClassify(LLM):
 
             item["ac_output"] = response
 
-        self.eval_output(eval_inputs, data, fromdb, type, iteration, test_iteration)
+        if self.web:
+            return eval_inputs[0]["ac_output"]
+        else:
+            self.eval_output(eval_inputs, data, fromdb, type, iteration, test_iteration)
 
 
 if __name__ == "__main__":

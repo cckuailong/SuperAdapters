@@ -289,7 +289,7 @@ class BLoomSeq2Seq(LLM):
 
         return output.split("### Response:")[1].strip()
 
-    def generate(self, instruction, input, data, fromdb, type, iteration, test_iteration):
+    def load_model(self):
         self.auto_device()
 
         model, self.tokenizer = self.get_model_tokenizer()
@@ -307,6 +307,11 @@ class BLoomSeq2Seq(LLM):
         if torch.__version__ >= "2" and sys.platform != "win32":
             model = torch.compile(model)
 
+        return model
+
+    def generate(self, instruction, input, data, fromdb, type, iteration, test_iteration):
+        model = self.load_model()
+
         eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration)
 
         for item in eval_inputs:
@@ -321,7 +326,10 @@ class BLoomSeq2Seq(LLM):
 
             item["ac_output"] = response
 
-        self.eval_output(eval_inputs, data, fromdb, type, iteration, test_iteration)
+        if self.web:
+            return eval_inputs[0]["ac_output"]
+        else:
+            self.eval_output(eval_inputs, data, fromdb, type, iteration, test_iteration)
 
 
 if __name__ == "__main__":

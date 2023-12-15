@@ -24,7 +24,7 @@ from peft import (
 from core.llm import LLM
 
 
-class QwenSeq2Seq(LLM):
+class MistrialSeq2Seq(LLM):
     tokenizer = None
 
     def get_model_tokenizer(self):
@@ -40,18 +40,19 @@ class QwenSeq2Seq(LLM):
             load_in_8bit=self.load_8bit,
             device_map=self.device_map,
             low_cpu_mem_usage=True,
+            quantization_config=bnb_config,
             trust_remote_code=True,
-            quantization_config=bnb_config
         )
         tokenizer = AutoTokenizer.from_pretrained(
             self.base_model,
             trust_remote_code=True,
-            add_eos_token=self.add_eos_token
-        )  # default add_eos_token=False
+            add_eos_token=True,
+            add_bos_token=True,
+        )
 
-        tokenizer.pad_token_id = tokenizer.eod_id
-        tokenizer.bos_token_id = tokenizer.eod_id
-        tokenizer.eos_token_id = tokenizer.eod_id
+        # Some Models like Qwen do not have pad_token
+        if tokenizer.pad_token is None:
+            tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
 
         return model, tokenizer
 
@@ -75,7 +76,6 @@ class QwenSeq2Seq(LLM):
             #    padding="max_length",
             padding=False,
             return_tensors=None,
-            allowed_special="all"
         )
 
         return {
@@ -160,17 +160,21 @@ class QwenSeq2Seq(LLM):
     def finetune(self, fromdb, iteration):
         self.auto_device()
 
+        if not self.lora_target_modules:
+            self.lora_target_modules = [
+                "q_proj",
+                "k_proj",
+                "v_proj",
+                "o_proj",
+                "gate_proj",
+                "up_proj",
+                "down_proj",
+                "lm_head",
+            ]
+
         model, self.tokenizer = self.get_model_tokenizer()
         if self.load_8bit:
             model = prepare_model_for_int8_training(model)
-
-        if not self.lora_target_modules:
-            self.lora_target_modules = [
-                "w1",
-                "w2",
-                "c_proj",
-                "c_attn"
-            ]
 
         model = self.load_adapter_config(model)
 
@@ -343,5 +347,5 @@ class QwenSeq2Seq(LLM):
 
 
 if __name__ == "__main__":
-    llama = QwenSeq2Seq()
-    llama.finetune()
+    m = MistrialSeq2Seq()
+    m.finetune()
