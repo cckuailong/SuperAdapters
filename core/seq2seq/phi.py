@@ -288,7 +288,7 @@ class PhiSeq2Seq(LLM):
                 # generation_config=generation_config,
                 # return_dict_in_generate=True,
                 # output_scores=True,
-                max_new_tokens=self.max_new_tokens,
+                max_length=self.max_new_tokens,
             )
         output = self.tokenizer.batch_decode(generation_output)[0]
 

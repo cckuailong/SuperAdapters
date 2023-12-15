@@ -110,3 +110,4 @@ websockets==11.0.3
 xxhash==3.2.0
 yarl==1.9.2
 zipp==3.15.0
+einops==0.7.0

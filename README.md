@@ -303,7 +303,7 @@ optional arguments:
 Add the "--web" parameter
 
 ```shell
-python inference.py --model_type phi --instruction "Who are you?" --model_path "LLMs/phi/phi-2" --adapter_weights "output/phi" --max_new_tokens 10 --web
+python inference.py --model_type phi --model_path "LLMs/phi/phi-2" --web
 ```
 
 ![](media/inference_web.png)
