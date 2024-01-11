@@ -168,7 +168,7 @@ class LLM:
             from common.db import get_mysql_conn
             conn = get_mysql_conn()
             cur = conn.cursor()
-            sql = "select instruction,input,output from playbooks where iteration=%s and `type`='train'"
+            sql = "select instruction,input,output from playbooks_all where iteration=%s and `type`='train' and is_check > 0"
             cur.execute(sql, s_iteration)
             items = cur.fetchall()
             cur.close()

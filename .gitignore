@@ -12,6 +12,7 @@ LLMs/Qwen/
 LLMs/baichuan/
 LLMs/mistrial/
 LLMs/phi/
+LLMs/InternLM/
 output/bloom/
 output/chatglm/
 output/llama/
