@@ -24,7 +24,7 @@ from peft import (
 from core.llm import LLM
 
 
-class MistrialSeq2Seq(LLM):
+class MixtralSeq2Seq(LLM):
     tokenizer = None
 
     def get_model_tokenizer(self):
@@ -347,5 +347,5 @@ class MistrialSeq2Seq(LLM):
 
 
 if __name__ == "__main__":
-    m = MistrialSeq2Seq()
+    m = MixtralSeq2Seq()
     m.finetune()

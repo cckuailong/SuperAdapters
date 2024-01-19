@@ -8,7 +8,7 @@ from core.seq2seq.llama import LLAMASeq2Seq
 from core.seq2seq.bloom import BLoomSeq2Seq
 from core.seq2seq.qwen import QwenSeq2Seq
 from core.seq2seq.baichuan import BaichuanSeq2Seq
-from core.seq2seq.mistrial import MistrialSeq2Seq
+from core.seq2seq.mixtral import MixtralSeq2Seq
 from core.seq2seq.phi import PhiSeq2Seq
 
 from core.classify.llama import LLAMAClassify
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     parser.add_argument('--instruction', default="Hello", type=str)
     parser.add_argument('--input', default=None, type=str)
     parser.add_argument('--data', default=None, help="The DIR of test data", type=str)
-    parser.add_argument('--model_type', default="llama", choices=['llama', 'llama2', 'chatglm', 'chatglm2', 'bloom', 'qwen', "baichuan", "mistrial", "phi"])
+    parser.add_argument('--model_type', default="llama", choices=['llama', 'llama2', 'chatglm', 'chatglm2', 'bloom', 'qwen', "baichuan", "mixtral", "phi"])
     parser.add_argument('--task_type', default="seq2seq", choices=['seq2seq', 'classify'])
     parser.add_argument('--labels', default="[\"0\", \"1\"]",
                         help="Labels to classify, only used when task_type is classify")
@@ -61,12 +61,12 @@ if __name__ == "__main__":
             llm = QwenSeq2Seq()
         elif args.model_type == "baichuan":
             llm = BaichuanSeq2Seq()
-        elif args.model_type == "mistrial":
-            llm = MistrialSeq2Seq()
+        elif args.model_type == "mixtral":
+            llm = MixtralSeq2Seq()
         elif args.model_type == "phi":
             llm = PhiSeq2Seq()
         else:
-            print("model_type should be llama/llama2/bloom/chatglm/chatglm2/qwen/baichuan/mistrial/phi")
+            print("model_type should be llama/llama2/bloom/chatglm/chatglm2/qwen/baichuan/mixtral/phi")
             sys.exit(-1)
     elif args.task_type == "classify":
         if args.model_type == "chatglm" or args.model_type == "chatglm2":
@@ -82,14 +82,14 @@ if __name__ == "__main__":
         elif args.model_type == "baichuan":
             print("Classify with Baichuan is not support now.")
             sys.exit(-1)
-        elif args.model_type == "mistrial":
-            print("Classify with Mistrial is not support now.")
+        elif args.model_type == "mixtral":
+            print("Classify with Mixtral is not support now.")
             sys.exit(-1)
         elif args.model_type == "phi":
             print("Classify with Phi is not support now.")
             sys.exit(-1)
         else:
-            print("model_type should be llama/llama2/bloom/chatglm/chatglm2/qwen/baichuan/mistrial/phi")
+            print("model_type should be llama/llama2/bloom/chatglm/chatglm2/qwen/baichuan/mixtral/phi")
             sys.exit(-1)
 
     llm.debug = args.debug

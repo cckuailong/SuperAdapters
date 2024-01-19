@@ -10,7 +10,7 @@ LLMs/vicuna/
 LLMs/UltraLM/
 LLMs/Qwen/
 LLMs/baichuan/
-LLMs/mistrial/
+LLMs/mixtral/
 LLMs/phi/
 LLMs/InternLM/
 output/bloom/
@@ -18,7 +18,7 @@ output/chatglm/
 output/llama/
 output/Qwen/
 output/baichuan/
-output/mistrial/
+output/mixtral/
 output/phi/
 venv/
 wandb/
