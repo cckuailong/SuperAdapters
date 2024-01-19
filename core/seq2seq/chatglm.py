@@ -174,21 +174,28 @@ class ChatGLMSeq2Seq(LLM):
     tokenizer = None
 
     def get_model_tokenizer(self):
-        bnb_config = None
         if self.adapter == "qlora":
             bnb_config = BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_quant_type="nf4",
                 bnb_4bit_compute_dtype=torch.float16
             )
-        model = AutoModel.from_pretrained(
-            self.base_model,
-            load_in_8bit=self.load_8bit,
-            torch_dtype=torch.float16,
-            trust_remote_code=True,
-            device_map=self.device_map,
-            quantization_config=bnb_config
-        )
+            model = AutoModel.from_pretrained(
+                self.base_model,
+                load_in_8bit=self.load_8bit,
+                torch_dtype=torch.float16,
+                trust_remote_code=True,
+                device_map=self.device_map,
+                quantization_config=bnb_config
+            )
+        else:
+            model = AutoModel.from_pretrained(
+                self.base_model,
+                load_in_8bit=self.load_8bit,
+                torch_dtype=torch.float16,
+                trust_remote_code=True,
+                device_map=self.device_map,
+            )
         tokenizer = AutoTokenizer.from_pretrained(
             self.base_model,
             trust_remote_code=True,

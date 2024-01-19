@@ -28,20 +28,26 @@ class BLoomSeq2Seq(LLM):
     tokenizer = None
 
     def get_model_tokenizer(self):
-        bnb_config = None
         if self.adapter == "qlora":
             bnb_config = BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_quant_type="nf4",
                 bnb_4bit_compute_dtype=torch.float16
             )
-        model = BloomForCausalLM.from_pretrained(
-            self.base_model,
-            load_in_8bit=self.load_8bit,
-            device_map=self.device_map,
-            low_cpu_mem_usage=True,
-            quantization_config=bnb_config,
-        )
+            model = BloomForCausalLM.from_pretrained(
+                self.base_model,
+                load_in_8bit=self.load_8bit,
+                device_map=self.device_map,
+                low_cpu_mem_usage=True,
+                quantization_config=bnb_config,
+            )
+        else:
+            model = BloomForCausalLM.from_pretrained(
+                self.base_model,
+                load_in_8bit=self.load_8bit,
+                device_map=self.device_map,
+                low_cpu_mem_usage=True,
+            )
         tokenizer = BloomTokenizerFast.from_pretrained(
             self.base_model,
             add_eos_token=self.add_eos_token

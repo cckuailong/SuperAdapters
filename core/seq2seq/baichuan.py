@@ -28,22 +28,28 @@ class BaichuanSeq2Seq(LLM):
     tokenizer = None
 
     def get_model_tokenizer(self):
-        bnb_config = None
         if self.adapter == "qlora":
             bnb_config = BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_quant_type="nf4",
                 bnb_4bit_compute_dtype=torch.float16
             )
-
-        model = AutoModelForCausalLM.from_pretrained(
-            self.base_model,
-            load_in_8bit=self.load_8bit,
-            device_map=self.device_map,
-            low_cpu_mem_usage=True,
-            quantization_config=bnb_config,
-            trust_remote_code=True,
-        )
+            model = AutoModelForCausalLM.from_pretrained(
+                self.base_model,
+                load_in_8bit=self.load_8bit,
+                device_map=self.device_map,
+                low_cpu_mem_usage=True,
+                quantization_config=bnb_config,
+                trust_remote_code=True,
+            )
+        else:
+            model = AutoModelForCausalLM.from_pretrained(
+                self.base_model,
+                load_in_8bit=self.load_8bit,
+                device_map=self.device_map,
+                low_cpu_mem_usage=True,
+                trust_remote_code=True,
+            )
         tokenizer = AutoTokenizer.from_pretrained(
             self.base_model,
             trust_remote_code=True,
