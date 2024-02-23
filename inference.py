@@ -15,6 +15,8 @@ from core.seq2seq.gemma import GemmaSeq2Seq
 from core.classify.llama import LLAMAClassify
 from core.classify.bloom import BLoomClassify
 
+from api.app import create_app
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Inference for all.')
@@ -22,6 +24,7 @@ if __name__ == "__main__":
     # system
     parser.add_argument('--debug', action="store_true", help="Debug Mode to output detail info")
     parser.add_argument('--web', action="store_true", help="Web Demo to try the inference")
+    parser.add_argument('--api', action="store_true", help="API to try the inference")
 
     # base
     parser.add_argument('--instruction', default="Hello", type=str)
@@ -189,7 +192,9 @@ if __name__ == "__main__":
         else:
             demo.queue().launch(server_name="0.0.0.0", server_port=7861, share=False,
                                 inbrowser=False)
-
+    elif args.api:
+        app = create_app(llm)
+        app.run(host="0.0.0.0", port=8888, threaded=True)
     else:
         llm.generate(args.instruction, args.input, args.data, args.fromdb, args.db_type, args.db_iteration, args.db_test_iteration)
 

@@ -267,7 +267,7 @@ optional arguments:
 ## Generate
 
 ```shell
-usage: inference.py [-h] [--debug] [--web] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}]
+usage: inference.py [-h] [--debug] [--web] [--api] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}]
                     [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit] [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K]
                     [--max_new_tokens MAX_NEW_TOKENS] [--fromdb] [--db_type DB_TYPE] [--db_iteration DB_ITERATION] [--db_test_iteration DB_TEST_ITERATION]
 
@@ -277,6 +277,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --debug               Debug Mode to output detail info
   --web                 Web Demo to try the inference
+  --api                 API to try the inference
   --instruction INSTRUCTION
   --input INPUT
   --data DATA           The DIR of test data
@@ -309,6 +310,14 @@ python inference.py --model_type phi --model_path "LLMs/phi/phi-2" --web
 ```
 
 ![](media/inference_web.png)
+
+## Inference API
+
+Add the "--api" parameter
+
+```shell
+python inference.py --model_type phi --model_path "LLMs/phi/phi-2" --api
+```
 
 ## Label Web
 
