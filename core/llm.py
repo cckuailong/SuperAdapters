@@ -15,6 +15,7 @@ from peft import (
 from typing import List
 from datasets import load_dataset, Dataset, DatasetDict
 
+os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 class LLM:
     # system

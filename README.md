@@ -13,8 +13,9 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 | ChatGLM2 | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
 | Qwen     | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | Baichuan | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
-| Mixtral | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+| Mixtral  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | Phi      | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+| Gemma    | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 
 **You can Finetune LLM on** 
 - Windows
@@ -74,8 +75,9 @@ pip install -r requirements.txt
 | ChatGLM  | [https://huggingface.co/THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b) |
 | ChatGLM2 | [https://huggingface.co/THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b) |
 | Qwen     | [https://huggingface.co/Qwen/Qwen-7B-Chat](https://huggingface.co/Qwen/Qwen-7B-Chat) |
-| Mixtral | [https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) |
+| Mixtral  | [https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) |
 | Phi      | [https://huggingface.co/microsoft/phi-2](https://huggingface.co/microsoft/phi-2) |
+| Gemma    | [https://huggingface.co/alpindale/gemma-2b-it](https://huggingface.co/alpindale/gemma-2b-it) |
 
 ## Finetune Data Format
 
@@ -209,7 +211,7 @@ python inference.py --model_type chatglm --fromdb --db_iteration xxxxxx --db_typ
 ### Finetune
 
 ```shell
-usage: finetune.py [-h] [--data DATA] [--model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan}] [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH]
+usage: finetune.py [-h] [--data DATA] [--model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}] [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH]
                    [--output_dir OUTPUT_DIR] [--disable_wandb] [--adapter {lora,qlora,adalora,prompt,p_tuning,prefix}] [--lora_r LORA_R] [--lora_alpha LORA_ALPHA] [--lora_dropout LORA_DROPOUT]
                    [--lora_target_modules LORA_TARGET_MODULES [LORA_TARGET_MODULES ...]] [--adalora_init_r ADALORA_INIT_R] [--adalora_tinit ADALORA_TINIT] [--adalora_tfinal ADALORA_TFINAL]
                    [--adalora_delta_t ADALORA_DELTA_T] [--num_virtual_tokens NUM_VIRTUAL_TOKENS] [--mapping_hidden_dim MAPPING_HIDDEN_DIM] [--epochs EPOCHS] [--learning_rate LEARNING_RATE]
@@ -222,7 +224,7 @@ Finetune for all.
 optional arguments:
   -h, --help            show this help message and exit
   --data DATA           the data used for instructing tuning
-  --model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi}
+  --model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}
   --task_type {seq2seq,classify}
   --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH
@@ -265,7 +267,7 @@ optional arguments:
 ## Generate
 
 ```shell
-usage: inference.py [-h] [--debug] [--web] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi}]
+usage: inference.py [-h] [--debug] [--web] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}]
                     [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit] [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K]
                     [--max_new_tokens MAX_NEW_TOKENS] [--fromdb] [--db_type DB_TYPE] [--db_iteration DB_ITERATION] [--db_test_iteration DB_TEST_ITERATION]
 
@@ -278,7 +280,7 @@ optional arguments:
   --instruction INSTRUCTION
   --input INPUT
   --data DATA           The DIR of test data
-  --model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi}
+  --model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}
   --task_type {seq2seq,classify}
   --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH

@@ -13,6 +13,7 @@ LLMs/baichuan/
 LLMs/mixtral/
 LLMs/phi/
 LLMs/InternLM/
+LLMs/Gemma/
 output/bloom/
 output/chatglm/
 output/llama/
@@ -20,6 +21,7 @@ output/Qwen/
 output/baichuan/
 output/mixtral/
 output/phi/
+output/gemma/
 venv/
 wandb/
 web/label_inner.py
