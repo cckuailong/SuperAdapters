@@ -20,6 +20,7 @@ from peft import (
     PeftModel
 )
 
+from tqdm import tqdm
 from core.llm import LLM
 
 
@@ -191,7 +192,7 @@ class BLoomClassify(LLM):
 
         eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration)
 
-        for item in eval_inputs:
+        for item in tqdm(eval_inputs):
             try:
                 response = self.evaluate(model, item["input"])
                 if response[-4:] == "</s>":

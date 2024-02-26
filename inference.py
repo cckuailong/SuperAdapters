@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import argparse
 import gradio as gr
 
@@ -196,5 +197,8 @@ if __name__ == "__main__":
         app = create_app(llm)
         app.run(host="0.0.0.0", port=8888, threaded=True)
     else:
+        start = time.time()
         llm.generate(args.instruction, args.input, args.data, args.fromdb, args.db_type, args.db_iteration, args.db_test_iteration)
+        end = time.time()
+        print("Eval Cost: {} seconds".format(end-start))
 
