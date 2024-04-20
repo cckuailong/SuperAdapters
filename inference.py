@@ -31,7 +31,7 @@ if __name__ == "__main__":
     parser.add_argument('--instruction', default="Hello", type=str)
     parser.add_argument('--input', default=None, type=str)
     parser.add_argument('--data', default=None, help="The DIR of test data", type=str)
-    parser.add_argument('--model_type', default="llama", choices=['llama', 'llama2', 'chatglm', 'chatglm2', 'bloom', 'qwen', "baichuan", "mixtral", "phi", "gemma"])
+    parser.add_argument('--model_type', default="llama", choices=['llama', 'llama2', 'llama3', 'chatglm', 'chatglm2', 'bloom', 'qwen', "baichuan", "mixtral", "phi", "gemma"])
     parser.add_argument('--task_type', default="seq2seq", choices=['seq2seq', 'classify'])
     parser.add_argument('--labels', default="[\"0\", \"1\"]",
                         help="Labels to classify, only used when task_type is classify")
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     if args.task_type == "seq2seq":
         if args.model_type == "chatglm" or args.model_type == "chatglm2":
             llm = ChatGLMSeq2Seq()
-        elif args.model_type == "llama" or args.model_type == "llama2":
+        elif args.model_type == "llama" or args.model_type == "llama2" or args.model_type == "llama3":
             llm = LLAMASeq2Seq()
         elif args.model_type == "bloom":
             llm = BLoomSeq2Seq()
@@ -73,13 +73,13 @@ if __name__ == "__main__":
         elif args.model_type == "gemma":
             llm = GemmaSeq2Seq()
         else:
-            print("model_type should be llama/llama2/bloom/chatglm/chatglm2/qwen/baichuan/mixtral/phi/gemma")
+            print("model_type should be llama/llama2/llama3/bloom/chatglm/chatglm2/qwen/baichuan/mixtral/phi/gemma")
             sys.exit(-1)
     elif args.task_type == "classify":
         if args.model_type == "chatglm" or args.model_type == "chatglm2":
             print("Classify with ChatGLM is not support now.")
             sys.exit(-1)
-        elif args.model_type == "llama" or args.model_type == "llama2":
+        elif args.model_type == "llama" or args.model_type == "llama2" or args.model_type == "llama3":
             llm = LLAMAClassify()
         elif args.model_type == "bloom":
             llm = BLoomClassify()
@@ -99,13 +99,14 @@ if __name__ == "__main__":
             print("Classify with Gemma is not support now.")
             sys.exit(-1)
         else:
-            print("model_type should be llama/llama2/bloom/chatglm/chatglm2/qwen/baichuan/mixtral/phi/gemma")
+            print("model_type should be llama/llama2/llama3/bloom/chatglm/chatglm2/qwen/baichuan/mixtral/phi/gemma")
             sys.exit(-1)
 
     llm.debug = args.debug
     llm.web = args.web
 
     llm.base_model = args.model_path
+    llm.model_type = args.model_type
     llm.adapter_weights = args.adapter_weights
 
     llm.load_8bit = args.load_8bit

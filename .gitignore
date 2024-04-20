@@ -6,6 +6,7 @@ LLMs/bloom/
 LLMs/chatglm/
 LLMs/open-llama/
 LLMs/llama2/
+LLMs/llama3/
 LLMs/vicuna/
 LLMs/UltraLM/
 LLMs/Qwen/
@@ -17,6 +18,8 @@ LLMs/Gemma/
 output/bloom/
 output/chatglm/
 output/llama/
+output/llama2/
+output/llama3/
 output/Qwen/
 output/baichuan/
 output/mixtral/

@@ -9,6 +9,7 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 | Bloom    | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | LLaMA    | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | LLaMA2   | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+| LLaMA3   | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | ChatGLM  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
 | ChatGLM2 | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :ballot_box_with_check: | :ballot_box_with_check: | :ballot_box_with_check: |
 | Qwen     | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
@@ -16,6 +17,8 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 | Mixtral  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | Phi      | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | Gemma    | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+
+*Attention: Not yet support LLama3 Inference on Mac with M1, waiting for pytorch to release new version. You can Inference with Mac CPU.(set env:`export PYTORCH_ENABLE_MPS_FALLBACK=1`)*
 
 **You can Finetune LLM on** 
 - Windows
@@ -71,6 +74,7 @@ pip install -r requirements.txt
 | Bloom    | [https://huggingface.co/bigscience/bloom-560m](https://huggingface.co/bigscience/bloom-560m) |
 | LLaMA    | [https://huggingface.co/openlm-research/open_llama_3b_600bt_preview](https://huggingface.co/openlm-research/open_llama_3b_600bt_preview) |
 | LLaMA2   | [https://huggingface.co/meta-llama/Llama-2-13b-hf](https://huggingface.co/meta-llama/Llama-2-13b-hf) |
+| LLaMA3   | [https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) |
 | Vicuna   | [https://huggingface.co/lmsys/vicuna-7b-delta-v1.1](https://huggingface.co/lmsys/vicuna-7b-delta-v1.1) |
 | ChatGLM  | [https://huggingface.co/THUDM/chatglm-6b](https://huggingface.co/THUDM/chatglm-6b) |
 | ChatGLM2 | [https://huggingface.co/THUDM/chatglm2-6b](https://huggingface.co/THUDM/chatglm2-6b) |
@@ -211,7 +215,7 @@ python inference.py --model_type chatglm --fromdb --db_iteration xxxxxx --db_typ
 ### Finetune
 
 ```shell
-usage: finetune.py [-h] [--data DATA] [--model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}] [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH]
+usage: finetune.py [-h] [--data DATA] [--model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}] [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH]
                    [--output_dir OUTPUT_DIR] [--disable_wandb] [--adapter {lora,qlora,adalora,prompt,p_tuning,prefix}] [--lora_r LORA_R] [--lora_alpha LORA_ALPHA] [--lora_dropout LORA_DROPOUT]
                    [--lora_target_modules LORA_TARGET_MODULES [LORA_TARGET_MODULES ...]] [--adalora_init_r ADALORA_INIT_R] [--adalora_tinit ADALORA_TINIT] [--adalora_tfinal ADALORA_TFINAL]
                    [--adalora_delta_t ADALORA_DELTA_T] [--num_virtual_tokens NUM_VIRTUAL_TOKENS] [--mapping_hidden_dim MAPPING_HIDDEN_DIM] [--epochs EPOCHS] [--learning_rate LEARNING_RATE]
@@ -224,7 +228,7 @@ Finetune for all.
 optional arguments:
   -h, --help            show this help message and exit
   --data DATA           the data used for instructing tuning
-  --model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}
+  --model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}
   --task_type {seq2seq,classify}
   --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH
@@ -267,7 +271,7 @@ optional arguments:
 ## Generate
 
 ```shell
-usage: inference.py [-h] [--debug] [--web] [--api] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}]
+usage: inference.py [-h] [--debug] [--web] [--api] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}]
                     [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit] [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K]
                     [--max_new_tokens MAX_NEW_TOKENS] [--fromdb] [--db_type DB_TYPE] [--db_iteration DB_ITERATION] [--db_test_iteration DB_TEST_ITERATION]
 
@@ -281,7 +285,7 @@ optional arguments:
   --instruction INSTRUCTION
   --input INPUT
   --data DATA           The DIR of test data
-  --model_type {llama,llama2,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}
+  --model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}
   --task_type {seq2seq,classify}
   --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH

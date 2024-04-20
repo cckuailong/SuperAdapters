@@ -98,7 +98,7 @@ torch==2.0.1
 torchaudio
 torchvision==0.15.2
 tqdm==4.65.0
-transformers==4.38.1
+transformers==4.40.0
 transformers-stream-generator==0.0.4
 typing-extensions==4.9.0
 tzdata==2023.3

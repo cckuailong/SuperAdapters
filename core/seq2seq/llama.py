@@ -11,6 +11,8 @@ from common.prompt import PROMPT_DICT
 from transformers import (
     LlamaForCausalLM,
     LlamaTokenizer,
+    AutoModelForCausalLM,
+    AutoTokenizer,
     GenerationConfig,
     BitsAndBytesConfig
 )
@@ -35,24 +37,47 @@ class LLAMASeq2Seq(LLM):
                 bnb_4bit_quant_type="nf4",
                 bnb_4bit_compute_dtype=torch.float16
             )
-            model = LlamaForCausalLM.from_pretrained(
+            if self.model_type == "llama3":
+                model = AutoModelForCausalLM.from_pretrained(
+                    self.base_model,
+                    load_in_8bit=self.load_8bit,
+                    device_map=self.device_map,
+                    low_cpu_mem_usage=True,
+                    quantization_config=bnb_config,
+                )
+            else:
+                model = LlamaForCausalLM.from_pretrained(
+                    self.base_model,
+                    load_in_8bit=self.load_8bit,
+                    device_map=self.device_map,
+                    low_cpu_mem_usage=True,
+                    quantization_config=bnb_config,
+                )
+        else:
+            if self.model_type == "llama3":
+                model = AutoModelForCausalLM.from_pretrained(
+                    self.base_model,
+                    load_in_8bit=self.load_8bit,
+                    device_map=self.device_map,
+                    low_cpu_mem_usage=True,
+                )
+            else:
+                model = LlamaForCausalLM.from_pretrained(
+                    self.base_model,
+                    load_in_8bit=self.load_8bit,
+                    device_map=self.device_map,
+                    low_cpu_mem_usage=True,
+                )
+        if self.model_type == "llama3":
+            tokenizer = AutoTokenizer.from_pretrained(
                 self.base_model,
-                load_in_8bit=self.load_8bit,
-                device_map=self.device_map,
-                low_cpu_mem_usage=True,
-                quantization_config=bnb_config,
+                add_eos_token=self.add_eos_token
             )
         else:
-            model = LlamaForCausalLM.from_pretrained(
+            tokenizer = LlamaTokenizer.from_pretrained(
                 self.base_model,
-                load_in_8bit=self.load_8bit,
-                device_map=self.device_map,
-                low_cpu_mem_usage=True,
+                add_eos_token=self.add_eos_token
             )
-        tokenizer = LlamaTokenizer.from_pretrained(
-            self.base_model,
-            add_eos_token=self.add_eos_token
-        )  # default add_eos_token=False
 
         # Some Models do not have pad_token
         if tokenizer.pad_token is None:
@@ -165,7 +190,7 @@ class LLAMASeq2Seq(LLM):
         self.auto_device()
 
         if not self.lora_target_modules:
-            if self.model_type == "llama2":
+            if self.model_type == "llama2" or self.model_type == "llama3":
                 self.lora_target_modules = [
                     "q_proj",
                     "v_proj",
@@ -338,14 +363,14 @@ class LLAMASeq2Seq(LLM):
         eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration)
 
         for item in tqdm(eval_inputs):
-            try:
-                response = self.evaluate(model, item["instruction"], item["input"])
-                if response[-4:] == "</s>":
-                    response = response[:-4]
-            except Exception as e:
-                if self.debug:
-                    print("[DEBUG] Error: " + str(e))
-                response = "Eval Error"
+            # try:
+            response = self.evaluate(model, item["instruction"], item["input"])
+            if response[-4:] == "</s>":
+                response = response[:-4]
+            # except Exception as e:
+                # if self.debug:
+                #     print("[DEBUG] Error: " + str(e))
+                # response = "Eval Error"
 
             item["ac_output"] = response
 
