@@ -16,9 +16,15 @@ Finetune ALL LLMs with ALL Adapeters on ALL Platforms!
 | Baichuan | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | Mixtral  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | Phi      | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
+| Phi3     | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 | Gemma    | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:      | :white_check_mark:      | :white_check_mark:      |
 
-*Attention: Not yet support LLama3 Inference on Mac with M1, waiting for pytorch to release new version. You can Inference with Mac CPU.(set env:`export PYTORCH_ENABLE_MPS_FALLBACK=1`)*
+*Attention: If you use Package "transformers 4.40.0", you will get an error(The operator 'aten::isin.Tensor_Tensor_out' is not currently implemented for the MPS device), because newest Pytorch has not supported Mac with it.
+
+You can choose one method to avoid the error:
+1. You can Inference with Mac CPU.(set env:`export PYTORCH_ENABLE_MPS_FALLBACK=1`)*
+2. Downgrade the transformers version. `pip install trasnformers==4.39.2`
+3. Wait for pytorch to release new version. 
 
 **You can Finetune LLM on** 
 - Windows
@@ -81,6 +87,7 @@ pip install -r requirements.txt
 | Qwen     | [https://huggingface.co/Qwen/Qwen-7B-Chat](https://huggingface.co/Qwen/Qwen-7B-Chat) |
 | Mixtral  | [https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) |
 | Phi      | [https://huggingface.co/microsoft/phi-2](https://huggingface.co/microsoft/phi-2) |
+| Phi3     | [https://huggingface.co/microsoft/Phi-3-mini-4k-instruct](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct) |
 | Gemma    | [https://huggingface.co/alpindale/gemma-2b-it](https://huggingface.co/alpindale/gemma-2b-it) |
 
 ## Finetune Data Format

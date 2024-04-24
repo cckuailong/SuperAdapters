@@ -13,6 +13,7 @@ LLMs/Qwen/
 LLMs/baichuan/
 LLMs/mixtral/
 LLMs/phi/
+LLMs/phi3/
 LLMs/InternLM/
 LLMs/Gemma/
 output/bloom/
@@ -24,6 +25,7 @@ output/Qwen/
 output/baichuan/
 output/mixtral/
 output/phi/
+output/phi-3/
 output/gemma/
 venv/
 wandb/
