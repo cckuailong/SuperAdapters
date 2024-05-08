@@ -44,6 +44,7 @@ class LLAMASeq2Seq(LLM):
                     device_map=self.device_map,
                     low_cpu_mem_usage=True,
                     quantization_config=bnb_config,
+                    trust_remote_code=True
                 )
             else:
                 model = LlamaForCausalLM.from_pretrained(
@@ -51,7 +52,7 @@ class LLAMASeq2Seq(LLM):
                     load_in_8bit=self.load_8bit,
                     device_map=self.device_map,
                     low_cpu_mem_usage=True,
-                    quantization_config=bnb_config,
+                    quantization_config=bnb_config
                 )
         else:
             if self.model_type == "llama3":
@@ -60,18 +61,20 @@ class LLAMASeq2Seq(LLM):
                     load_in_8bit=self.load_8bit,
                     device_map=self.device_map,
                     low_cpu_mem_usage=True,
+                    trust_remote_code=True
                 )
             else:
                 model = LlamaForCausalLM.from_pretrained(
                     self.base_model,
                     load_in_8bit=self.load_8bit,
                     device_map=self.device_map,
-                    low_cpu_mem_usage=True,
+                    low_cpu_mem_usage=True
                 )
         if self.model_type == "llama3":
             tokenizer = AutoTokenizer.from_pretrained(
                 self.base_model,
-                add_eos_token=self.add_eos_token
+                add_eos_token=self.add_eos_token,
+                trust_remote_code=True
             )
         else:
             tokenizer = LlamaTokenizer.from_pretrained(
