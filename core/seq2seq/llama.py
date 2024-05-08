@@ -363,14 +363,14 @@ class LLAMASeq2Seq(LLM):
         eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration)
 
         for item in tqdm(eval_inputs):
-            # try:
-            response = self.evaluate(model, item["instruction"], item["input"])
-            if response[-4:] == "</s>":
-                response = response[:-4]
-            # except Exception as e:
-                # if self.debug:
-                #     print("[DEBUG] Error: " + str(e))
-                # response = "Eval Error"
+            try:
+                response = self.evaluate(model, item["instruction"], item["input"])
+                if response[-4:] == "</s>":
+                    response = response[:-4]
+            except Exception as e:
+                if self.debug:
+                    print("[DEBUG] Error: " + str(e))
+                response = "Eval Error"
 
             item["ac_output"] = response
 
