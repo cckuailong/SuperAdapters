@@ -2,7 +2,7 @@ import os
 import pymysql
 
 MYSQL_DB_HOST = os.getenv('LLM_DB_HOST')
-MYSQL_DB_PORT = int(os.getenv('LLM_DB_PORT'))
+MYSQL_DB_PORT = int(os.getenv('LLM_DB_PORT', 3306))
 MYSQL_DB_USERNAME = os.getenv('LLM_DB_USERNAME')
 MYSQL_DB_PASSWORD = os.getenv('LLM_DB_PASSWORD')
 MYSQL_DB_NAME = os.getenv('LLM_DB_NAME')
@@ -20,5 +20,7 @@ def get_mysql_conn():
 
     return conn
 
-
-conn = get_mysql_conn()
+try:
+    conn = get_mysql_conn()
+except:
+    conn = None
