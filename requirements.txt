@@ -60,7 +60,7 @@ orjson==3.9.0
 packaging==23.1
 pandas==2.0.2
 pathtools==0.1.2
-peft @ git+https://github.com/huggingface/peft@7fb5f90a38cb39a31396de7e638ead9ecea692af
+peft==0.9.0
 Pillow==9.5.0
 pkgutil-resolve-name==1.3.10
 protobuf==4.23.3
