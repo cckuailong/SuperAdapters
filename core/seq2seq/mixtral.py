@@ -252,7 +252,10 @@ class MixtralSeq2Seq(LLM):
         model.config.use_cache = False
 
         if torch.__version__ >= "2" and sys.platform != "win32":
-            model = torch.compile(model)
+            try:
+                model = torch.compile(model)
+            except:
+                print("Warning: torch.compile() failed, will skip it.")
 
         trainer.train(resume_from_checkpoint=self.resume_from_checkpoint)
 
