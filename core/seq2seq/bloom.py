@@ -310,9 +310,15 @@ class BLoomSeq2Seq(LLM):
         if not self.load_8bit and self.device != "cpu":
             model.half()
 
-        model.to(self.device).eval()
+        if self.load_8bit:
+            model.eval()
+        else:
+            model.to(self.device).eval()
         if torch.__version__ >= "2" and sys.platform != "win32":
-            model = torch.compile(model)
+            try:
+                model = torch.compile(model)
+            except:
+                print("Warning: torch.compile() failed, will skip it.")
 
         return model
 
