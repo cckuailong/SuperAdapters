@@ -13,6 +13,7 @@ from transformers import (
     BloomForSequenceClassification,
     BitsAndBytesConfig
 )
+from safetensors.torch import load_file
 
 from peft import (
     prepare_model_for_int8_training,
@@ -109,6 +110,9 @@ class BLoomClassify(LLM):
                 checkpoint_name = os.path.join(
                     self.resume_from_checkpoint, "adapter_model.bin"
                 )  # only LoRA model - LoRA config above has to fit
+                checkpoint_name_new = os.path.join(
+                    self.resume_from_checkpoint, "adapter_model.safetensors"
+                )  # when peft >= 0.7.1, the default storage name is "adapter_model.safetensors"
                 self.resume_from_checkpoint = (
                     False  # So the trainer won't try loading its state
                 )
@@ -116,6 +120,10 @@ class BLoomClassify(LLM):
             if os.path.exists(checkpoint_name):
                 print(f"Restarting from {checkpoint_name}")
                 adapters_weights = torch.load(checkpoint_name)
+                set_peft_model_state_dict(model, adapters_weights)
+            elif os.path.exists(checkpoint_name_new):
+                print(f"Restarting from {checkpoint_name_new}")
+                adapters_weights = load_file(checkpoint_name_new)
                 set_peft_model_state_dict(model, adapters_weights)
             else:
                 print(f"Checkpoint {checkpoint_name} not found")
@@ -127,7 +135,7 @@ class BLoomClassify(LLM):
         train_args = transformers.TrainingArguments(
             per_device_train_batch_size=self.per_gpu_train_batch_size,
             gradient_accumulation_steps=self.gradient_accumulation_steps,
-            warmup_steps=warmup_steps,
+            warmup_steps=warmup_steps if warmup_steps != 1 else 2,
             num_train_epochs=self.epochs,
             learning_rate=self.learning_rate,
             fp16=self.is_fp16,
