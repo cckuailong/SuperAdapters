@@ -34,3 +34,4 @@ web/label_inner.py
 data/train/*
 !data/train/example.json
 api/test/test_api.py
+api/libs/

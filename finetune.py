@@ -149,7 +149,7 @@ if __name__ == "__main__":
 
     if not os.path.exists(llm.output_dir):
         os.makedirs(llm.output_dir)
-        print("Warning: Directory {} Not Found, create automatically")
+        print("Warning: Directory {} Not Found, create automatically".format(llm.output_dir))
 
     if llm.adapter == "qlora" and sys.platform == "darwin":
         print("Unfortunately, SuperAdapters do not support qlora on Mac, please use lora/adalora instead")
