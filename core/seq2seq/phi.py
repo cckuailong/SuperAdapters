@@ -347,10 +347,10 @@ class PhiSeq2Seq(LLM):
 
         return model
 
-    def generate(self, instruction, input, data, fromdb, type, iteration, test_iteration):
+    def generate(self, instruction, input, data, fromdb, type, iteration, test_iteration, max_input):
         model = self.load_model()
 
-        eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration)
+        eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration, max_input)
 
         for item in tqdm(eval_inputs):
             try:

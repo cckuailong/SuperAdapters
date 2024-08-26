@@ -190,7 +190,7 @@ class LLM:
 
         return data
 
-    def get_eval_input(self, s_instruction, s_input, s_data, fromdb, s_type, s_iteration):
+    def get_eval_input(self, s_instruction, s_input, s_data, fromdb, s_type, s_iteration, max_input):
         result = []
         if fromdb:
             from common.db import get_mysql_conn
@@ -204,6 +204,8 @@ class LLM:
 
             for item in items:
                 payload_uuid, instruction, input, output = item
+                if max_input:
+                    input = input[:int(max_input)]
                 result.append({
                     "payload_uuid": payload_uuid,
                     "instruction": instruction,
@@ -215,6 +217,8 @@ class LLM:
                 test_items = json.loads(f.read())
             result = test_items
         else:
+            if max_input:
+                s_input = s_input[:int(max_input)]
             result.append({
                 "instruction": s_instruction,
                 "input": s_input

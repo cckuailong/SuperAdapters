@@ -30,6 +30,7 @@ if __name__ == "__main__":
     # base
     parser.add_argument('--instruction', default="Hello", type=str)
     parser.add_argument('--input', default=None, type=str)
+    parser.add_argument('--max_input', default=None, type=int, help="Limit the input length to avoid OOM or other bugs")
     parser.add_argument('--data', default=None, help="The DIR of test data", type=str)
     parser.add_argument('--model_type', default="llama", choices=['llama', 'llama2', 'llama3', 'chatglm', 'chatglm2', 'bloom', 'qwen', "baichuan", "mixtral", "phi", "phi3", "gemma"])
     parser.add_argument('--task_type', default="seq2seq", choices=['seq2seq', 'classify'])
@@ -199,7 +200,7 @@ if __name__ == "__main__":
         app.run(host="0.0.0.0", port=8888, threaded=True)
     else:
         start = time.time()
-        llm.generate(args.instruction, args.input, args.data, args.fromdb, args.db_type, args.db_iteration, args.db_test_iteration)
+        llm.generate(args.instruction, args.input, args.data, args.fromdb, args.db_type, args.db_iteration, args.db_test_iteration, args.max_input)
         end = time.time()
         print("Eval Cost: {} seconds".format(end-start))
 

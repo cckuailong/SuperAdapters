@@ -284,6 +284,8 @@ optional arguments:
   --api                 API to try the inference
   --instruction INSTRUCTION
   --input INPUT
+  --max_input MAX_INPUT
+                        Limit the input length to avoid OOM or other bugs
   --data DATA           The DIR of test data
   --model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}
   --task_type {seq2seq,classify}
