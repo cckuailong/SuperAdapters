@@ -358,6 +358,8 @@ class MixtralSeq2Seq(LLM):
                 response = self.evaluate(model, item["instruction"], item["input"])
                 if response[-4:] == "</s>":
                     response = response[:-4]
+                elif response[-4:] == "<|end_of_text|>":
+                    response = response[:-15]
             except Exception as e:
                 if self.debug:
                     print("[DEBUG] Error: " + str(e))
