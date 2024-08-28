@@ -62,6 +62,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--fromdb', action="store_true")
     parser.add_argument('--db_iteration', default=None, type=str, help="The record's set name.")
+    parser.add_argument('--db_item_num', default=0, type=int, help="The Limit Num of train/test items selected from DB.")
 
     args, _ = parser.parse_known_args()
 

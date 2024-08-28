@@ -333,10 +333,10 @@ class BLoomSeq2Seq(LLM):
 
         return model
 
-    def generate(self, instruction, input, data, fromdb, type, iteration, test_iteration, max_input):
+    def generate(self, instruction, input, data, fromdb, type, iteration, test_iteration):
         model = self.load_model()
 
-        eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration, max_input)
+        eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration)
 
         for item in tqdm(eval_inputs):
             try:

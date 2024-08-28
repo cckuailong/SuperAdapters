@@ -185,7 +185,7 @@ class BLoomClassify(LLM):
 
             return self.labels[predicted_class_idx]
 
-    def generate(self, instruction, input, data, fromdb, type, iteration, test_iteration, max_input):
+    def generate(self, instruction, input, data, fromdb, type, iteration, test_iteration):
         self.auto_device()
 
         model, self.tokenizer = self.get_model_tokenizer()
@@ -201,7 +201,7 @@ class BLoomClassify(LLM):
 
         model.to(self.device).eval()
 
-        eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration, max_input)
+        eval_inputs = self.get_eval_input(instruction, input, data, fromdb, type, iteration)
 
         for item in tqdm(eval_inputs):
             try:

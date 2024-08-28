@@ -81,6 +81,8 @@ class LLM:
     top_p: float = 0.9
     top_k: int = 40
     max_new_tokens: int = 512
+    max_input: int = 0
+    db_item_num: int = 0
 
     def load_adapter_config(self, model):
         if self.task_type == "seq2seq":
@@ -170,6 +172,8 @@ class LLM:
             conn = get_mysql_conn()
             cur = conn.cursor()
             sql = "select instruction,input,output from playbooks_all where iteration=%s and `type`='train' and is_check > 0"
+            if self.db_item_num > 0:
+                sql += " limit {}".format(self.db_item_num)
             cur.execute(sql, s_iteration)
             items = cur.fetchall()
             cur.close()
@@ -190,13 +194,15 @@ class LLM:
 
         return data
 
-    def get_eval_input(self, s_instruction, s_input, s_data, fromdb, s_type, s_iteration, max_input):
+    def get_eval_input(self, s_instruction, s_input, s_data, fromdb, s_type, s_iteration):
         result = []
         if fromdb:
             from common.db import get_mysql_conn
             conn = get_mysql_conn()
             cur = conn.cursor()
             sql = "select payload_uuid,instruction,input,output from playbooks where type=%s and iteration=%s"
+            if self.db_item_num > 0:
+                sql += " limit {}".format(self.db_item_num)
             cur.execute(sql, (s_type, s_iteration))
             items = cur.fetchall()
             cur.close()
@@ -204,8 +210,8 @@ class LLM:
 
             for item in items:
                 payload_uuid, instruction, input, output = item
-                if max_input:
-                    input = input[:int(max_input)]
+                if self.max_input:
+                    input = input[:self.max_input]
                 result.append({
                     "payload_uuid": payload_uuid,
                     "instruction": instruction,
@@ -217,8 +223,8 @@ class LLM:
                 test_items = json.loads(f.read())
             result = test_items
         else:
-            if max_input:
-                s_input = s_input[:int(max_input)]
+            if self.max_input:
+                s_input = s_input[:self.max_input]
             result.append({
                 "instruction": s_instruction,
                 "input": s_input

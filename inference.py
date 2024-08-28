@@ -52,7 +52,7 @@ if __name__ == "__main__":
     parser.add_argument('--db_type', default=None, type=str, help="The record is whether 'train' or 'test'.")
     parser.add_argument('--db_iteration', default=None, type=str, help="The record's set name.")
     parser.add_argument('--db_test_iteration', default=None, type=str, help="The record's test set name.")
-
+    parser.add_argument('--db_item_num', default=0, type=int, help="The Limit Num of train/test items selected from DB.")
 
     args, _ = parser.parse_known_args()
 
@@ -116,6 +116,8 @@ if __name__ == "__main__":
     llm.top_p = args.top_p
     llm.top_k = args.top_k
     llm.max_new_tokens = args.max_new_tokens
+    llm.max_input = args.max_input
+    llm.db_item_num = args.db_item_num
 
     if args.web:
         model = llm.load_model()
@@ -200,7 +202,7 @@ if __name__ == "__main__":
         app.run(host="0.0.0.0", port=8888, threaded=True)
     else:
         start = time.time()
-        llm.generate(args.instruction, args.input, args.data, args.fromdb, args.db_type, args.db_iteration, args.db_test_iteration, args.max_input)
+        llm.generate(args.instruction, args.input, args.data, args.fromdb, args.db_type, args.db_iteration, args.db_test_iteration)
         end = time.time()
         print("Eval Cost: {} seconds".format(end-start))
 

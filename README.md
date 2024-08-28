@@ -266,6 +266,8 @@ optional arguments:
   --fromdb
   --db_iteration DB_ITERATION
                         The record's set name.
+  --db_item_num DB_ITEM_NUM
+                        The Limit Num of train/test items selected from DB.
 ```
 
 ## Generate
@@ -305,6 +307,8 @@ optional arguments:
                         The record's set name.
   --db_test_iteration DB_TEST_ITERATION
                         The record's test set name.
+  --db_item_num DB_ITEM_NUM
+                        The Limit Num of train/test items selected from DB.
 ```
 
 ## Inference Web
