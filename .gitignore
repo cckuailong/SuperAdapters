@@ -27,6 +27,7 @@ output/mixtral/
 output/phi/
 output/phi-3/
 output/gemma/
+output/combine/
 venv/
 wandb/
 web/label_inner.py

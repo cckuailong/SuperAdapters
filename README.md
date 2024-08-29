@@ -311,6 +311,30 @@ optional arguments:
                         The Limit Num of train/test items selected from DB.
 ```
 
+## Tool
+
+### Combine Base Model and Adapter weight
+
+```
+usage: tool.py combine [-h] [--model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,phi3,gemma}] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS]
+                       [--output_dir OUTPUT_DIR] [--max_shard_size MAX_SHARD_SIZE]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,phi3,gemma}
+  --model_path MODEL_PATH
+  --adapter_weights ADAPTER_WEIGHTS
+                        The DIR of adapter weights
+  --output_dir OUTPUT_DIR
+                        The DIR to save the model
+  --max_shard_size MAX_SHARD_SIZE
+                        Max size of each of the combined model weight, like 1GB,5GB,etc.
+```
+
+```
+python tool.py combine --model_type llama --model_path "LLMs/open-llama/open-llama-3b/" --adapter_weights "output/llama/" --output_dir "output/combine/"
+```
+
 ## Inference Web
 
 Add the "--web" parameter

@@ -298,6 +298,16 @@ class ChatGLMSeq2Seq(LLM):
         self.eval_load_model()
         self.generate_base()
 
+    def combine(self):
+        self.auto_device()
+        self.model, self.tokenizer = self.get_model_tokenizer()
+        deloreanized_sd = self.combine_base()
+        AutoModel.save_pretrained(
+            self.model, self.output_dir, state_dict=deloreanized_sd, max_shard_size=self.max_shard_size
+        )
+
+        self.tokenizer.save_pretrained(self.output_dir)
+
 
 if __name__ == "__main__":
     chatglm = ChatGLMSeq2Seq()

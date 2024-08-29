@@ -107,7 +107,8 @@ class LLM:
     input = ""
     test_data_path = ""
 
-
+    # tool
+    max_shard_size = "5GB"
 
     def load_adapter_config(self, model):
         if self.task_type == "seq2seq":
@@ -513,3 +514,23 @@ class LLM:
             return eval_inputs[0]["ac_output"]
         else:
             self.eval_output(eval_inputs)
+
+    # -------------- Format Inference - ---------------
+    def combine_base(self):
+        lora_model = PeftModel.from_pretrained(
+            self.model,
+            self.adapter_weights,
+        )
+
+        lora_model = lora_model.merge_and_unload()
+        lora_model.train(False)
+
+        lora_model_sd = lora_model.state_dict()
+        deloreanized_sd = {
+            k.replace("base_model.model.", ""): v
+            for k, v in lora_model_sd.items()
+            if "lora" not in k
+        }
+
+        return deloreanized_sd
+
