@@ -35,8 +35,7 @@ def call():
         return jsonify({'succeed': False, 'msg': 'Missing Param: input'})
 
     input = dataj["input"]
-    model = current_app.config["model"]
     llm = current_app.config["llm"]
-    resp = llm.evaluate(model, instruction, input)
+    resp = llm.evaluate(instruction, input)
 
     return json.dumps({'succeed': True, 'text': resp}, ensure_ascii=False)

@@ -148,6 +148,9 @@ if __name__ == "__main__":
     llm.per_gpu_train_batch_size = args.per_gpu_train_batch_size
     llm.gradient_accumulation_steps = args.gradient_accumulation_steps
 
+    llm.fromdb = args.fromdb
+    llm.db_iteration = args.db_iteration
+
     if not os.path.exists(llm.output_dir):
         os.makedirs(llm.output_dir)
         print("Warning: Directory {} Not Found, create automatically".format(llm.output_dir))
@@ -156,4 +159,4 @@ if __name__ == "__main__":
         print("Unfortunately, SuperAdapters do not support qlora on Mac, please use lora/adalora instead")
         sys.exit(-1)
 
-    llm.finetune(args.fromdb, args.db_iteration)
+    llm.finetune()

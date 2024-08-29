@@ -31,7 +31,7 @@ if __name__ == "__main__":
     parser.add_argument('--instruction', default="Hello", type=str)
     parser.add_argument('--input', default=None, type=str)
     parser.add_argument('--max_input', default=None, type=int, help="Limit the input length to avoid OOM or other bugs")
-    parser.add_argument('--data', default=None, help="The DIR of test data", type=str)
+    parser.add_argument('--test_data_path', default=None, help="The DIR of test data", type=str)
     parser.add_argument('--model_type', default="llama", choices=['llama', 'llama2', 'llama3', 'chatglm', 'chatglm2', 'bloom', 'qwen', "baichuan", "mixtral", "phi", "phi3", "gemma"])
     parser.add_argument('--task_type', default="seq2seq", choices=['seq2seq', 'classify'])
     parser.add_argument('--labels', default="[\"0\", \"1\"]",
@@ -117,10 +117,18 @@ if __name__ == "__main__":
     llm.top_k = args.top_k
     llm.max_new_tokens = args.max_new_tokens
     llm.max_input = args.max_input
+
+    llm.fromdb = args.fromdb
+    llm.db_type = args.db_type
+    llm.db_iteration = args.db_iteration
+    llm.db_test_iteration = args.db_test_iteration
     llm.db_item_num = args.db_item_num
+    llm.instruction = args.instruction
+    llm.input = args.input
+    llm.test_data_path = args.test_data_path
 
     if args.web:
-        model = llm.load_model()
+        llm.eval_load_model()
         def parse_text(text):
             lines = text.split("\n")
             lines = [line for line in lines if line != ""]
@@ -154,7 +162,7 @@ if __name__ == "__main__":
 
         def predict(input, chatbot, history):
             chatbot.append((parse_text(input), ""))
-            response = llm.evaluate(model, "", input)
+            response = llm.evaluate("", input)
             # print(response)
             chatbot[-1] = (parse_text(input), response)
 
@@ -202,7 +210,7 @@ if __name__ == "__main__":
         app.run(host="0.0.0.0", port=8888, threaded=True)
     else:
         start = time.time()
-        llm.generate(args.instruction, args.input, args.data, args.fromdb, args.db_type, args.db_iteration, args.db_test_iteration)
+        llm.generate()
         end = time.time()
         print("Eval Cost: {} seconds".format(end-start))
 

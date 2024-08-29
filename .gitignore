@@ -33,5 +33,6 @@ web/label_inner.py
 !data/train
 data/train/*
 !data/train/example.json
-api/test/test_api.py
+api/test/
+api/app/bp/api_v1_guardlm.py
 api/libs/

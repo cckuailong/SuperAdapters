@@ -2,6 +2,11 @@ import os
 import sys
 import json
 import torch
+import transformers
+from transformers import (
+    GenerationConfig,
+)
+from safetensors.torch import load_file
 from peft import (
     AdaLoraConfig,
     PrefixTuningConfig,
@@ -10,10 +15,15 @@ from peft import (
     LoraConfig,
     TaskType,
     get_peft_model,
+    prepare_model_for_int8_training,
+    set_peft_model_state_dict,
+    PeftModel,
 )
 
 from typing import List
 from datasets import load_dataset, Dataset, DatasetDict
+from tqdm import tqdm
+from common.prompt import PROMPT_DICT
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
@@ -82,7 +92,22 @@ class LLM:
     top_k: int = 40
     max_new_tokens: int = 512
     max_input: int = 0
+
+    model = None
+    tokenizer = None
+    tokenize_prompt = None
+    train_data_collator = None
+
+    fromdb = False
+    db_type = ""
+    db_iteration = ""
+    db_test_iteration = ""
     db_item_num: int = 0
+    instruction = ""
+    input = ""
+    test_data_path = ""
+
+
 
     def load_adapter_config(self, model):
         if self.task_type == "seq2seq":
@@ -163,6 +188,23 @@ class LLM:
                 self.is_fp16 = False
             self.device_map = "auto"
 
+    # -------------- Inference ----------------
+    #
+    #
+    # Generate the prompt to format the LLM input.
+    def generate_prompt(self, data_point):
+        # a nasty solution just for now
+        if 'Human:' in data_point["instruction"] and 'Assistant:' in data_point["instruction"]:  # TODO
+            data_point["instruction"] = data_point["instruction"].replace('Human:', '### Human: ')
+            data_point["instruction"] = data_point["instruction"].replace('Assistant:', '### Assistant: ')
+
+            return PROMPT_DICT['prompt_multirun_input'].format_map(data_point)
+
+        prompt_ = PROMPT_DICT['prompt_input'] if data_point["input"] else PROMPT_DICT['prompt_no_input']
+
+        return prompt_.format_map(data_point)
+
+    # Load the train data
     def load_train_data(self, fromdb, s_iteration):
         data = None
         if fromdb:
@@ -194,16 +236,183 @@ class LLM:
 
         return data
 
-    def get_eval_input(self, s_instruction, s_input, s_data, fromdb, s_type, s_iteration):
+    def split_train_data(self, data):
+        if self.val_set_size > 0:
+            train_val = data["train"].train_test_split(
+                test_size=self.val_set_size, shuffle=True, seed=42
+            )
+            train_data = (
+                train_val["train"].shuffle().map(self.tokenize_prompt)
+            )
+            val_data = (
+                train_val["test"].shuffle().map(self.tokenize_prompt)
+            )
+        else:
+            train_data = data["train"].shuffle().map(self.tokenize_prompt)
+            val_data = None
+
+        return train_data, val_data
+
+    # Finetune main function.
+    def finetune_base(self):
+        if self.load_8bit:
+            self.model = prepare_model_for_int8_training(self.model)
+
+        self.model = self.load_adapter_config(self.model)
+
+        data = self.load_train_data(self.fromdb, self.db_iteration)
+        print(data)
+        if not data:
+            print("Warning! Empty Train Data!")
+            return
+
+        train_data, val_data = self.split_train_data(data)
+
+        if self.resume_from_checkpoint:
+            # Check the available weights and load them
+            checkpoint_name = os.path.join(
+                self.resume_from_checkpoint, "pytorch_model.bin"
+            )  # Full checkpoint
+            if not os.path.exists(checkpoint_name):
+                checkpoint_name = os.path.join(
+                    self.resume_from_checkpoint, "adapter_model.bin"
+                )  # only LoRA model - LoRA config above has to fit
+                checkpoint_name_new = os.path.join(
+                    self.resume_from_checkpoint, "adapter_model.safetensors"
+                )  # when peft >= 0.7.1, the default storage name is "adapter_model.safetensors"
+                self.resume_from_checkpoint = (
+                    False  # So the trainer won't try loading its state
+                )
+            # The two files above have a different name depending on how they were saved, but are actually the same.
+            if os.path.exists(checkpoint_name):
+                print(f"Restarting from {checkpoint_name}")
+                adapters_weights = torch.load(checkpoint_name)
+                set_peft_model_state_dict(self.model, adapters_weights)
+            elif os.path.exists(checkpoint_name_new):
+                print(f"Restarting from {checkpoint_name_new}")
+                adapters_weights = load_file(checkpoint_name_new)
+                set_peft_model_state_dict(self.model, adapters_weights)
+            else:
+                print(f"Checkpoint {checkpoint_name} not found")
+
+        total_batch_size = self.per_gpu_train_batch_size * self.gradient_accumulation_steps * (self.world_size if self.ddp else 1)
+        total_optim_steps = train_data.num_rows // total_batch_size
+        saving_step = int(total_optim_steps / 10)
+        warmup_steps = int(total_optim_steps / 10)
+        train_args = transformers.TrainingArguments(
+            per_device_train_batch_size=self.per_gpu_train_batch_size,
+            gradient_accumulation_steps=self.gradient_accumulation_steps,
+            warmup_steps=warmup_steps if warmup_steps != 1 else 2,
+            num_train_epochs=self.epochs,
+            learning_rate=self.learning_rate,
+            fp16=self.is_fp16,
+            optim="adamw_torch",
+            logging_steps=self.logging_steps,
+            eval_strategy="steps" if self.val_set_size > 0 else "no",
+            save_strategy="steps",
+            eval_steps=saving_step if self.val_set_size > 0 else None,
+            save_steps=saving_step,
+            # max_steps=200,
+            output_dir=self.output_dir,
+            save_total_limit=11,
+            load_best_model_at_end=True if self.val_set_size > 0 else False,
+            ddp_find_unused_parameters=False if self.ddp else None,
+            group_by_length=self.group_by_length,
+            use_mps_device=self.use_mps_device,
+            report_to=None if self.disable_wandb else "wandb"
+        )
+
+        trainer = transformers.Trainer(
+            model=self.model,
+            train_dataset=train_data,
+            eval_dataset=val_data,
+            args=train_args,
+            data_collator=self.train_data_collator,
+        )
+
+        self.model.config.use_cache = False
+
+        if torch.__version__ >= "2" and sys.platform != "win32":
+            try:
+                self.model = torch.compile(self.model)
+            except:
+                print("Warning: torch.compile() failed, will skip it.")
+
+        trainer.train(resume_from_checkpoint=self.resume_from_checkpoint)
+
+        self.model.save_pretrained(self.output_dir)
+
+        print("\n If there's a warning about missing keys above, please disregard :)")
+
+    # -------------- Inference ----------------
+    #
+    #
+    # Function evaluate() is the core.
+    #
+    # Generate the prompt to format the LLM output.
+    def generate_eval_prompt(self, instruction, input=None):
+        if input:
+            return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+
+    ### Instruction:
+    {instruction}
+
+    ### Input:
+    {input}
+
+    ### Response:"""
+        else:
+            return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+    ### Instruction:
+    {instruction}
+
+    ### Response:"""
+
+    # Inference main function.
+    def evaluate(self,
+                 instruction,
+                 input=None,
+                 **kwargs,
+                 ):
+        prompt = self.generate_eval_prompt(instruction, input)
+        inputs = self.tokenizer(prompt, return_tensors="pt")
+        input_ids = inputs["input_ids"].to(self.device)
+        generation_config = GenerationConfig(
+            temperature=self.temperature,
+            top_p=self.top_p,
+            top_k=self.top_k,
+            num_beams=4,
+            do_sample=True,
+            no_repeat_ngram_size=6,
+            repetition_penalty=1.8,
+            **kwargs,
+        )
+        with torch.no_grad():
+            generation_output = self.model.generate(
+                input_ids=input_ids,
+                generation_config=generation_config,
+                return_dict_in_generate=True,
+                output_scores=True,
+                max_new_tokens=self.max_new_tokens,
+            )
+        s = generation_output.sequences[0]
+        output = self.tokenizer.decode(s)
+
+        return output.split("### Response:")[1].strip()
+
+    # -------------- Format Inference - ---------------
+    # Get Input or the question.
+    def get_eval_input(self):
         result = []
-        if fromdb:
+        if self.fromdb:
             from common.db import get_mysql_conn
             conn = get_mysql_conn()
             cur = conn.cursor()
             sql = "select payload_uuid,instruction,input,output from playbooks where type=%s and iteration=%s"
             if self.db_item_num > 0:
                 sql += " limit {}".format(self.db_item_num)
-            cur.execute(sql, (s_type, s_iteration))
+            cur.execute(sql, (self.db_type, self.db_iteration))
             items = cur.fetchall()
             cur.close()
             conn.close()
@@ -218,28 +427,51 @@ class LLM:
                     "input": input,
                     "output": output
                 })
-        elif s_data:
-            with open(s_data, "r") as f:
+        elif self.test_data_path:
+            with open(self.test_data_path, "r") as f:
                 test_items = json.loads(f.read())
             result = test_items
         else:
             if self.max_input:
-                s_input = s_input[:self.max_input]
+                self.input = self.input[:self.max_input]
             result.append({
-                "instruction": s_instruction,
-                "input": s_input
+                "instruction": self.instruction,
+                "input": self.input
             })
 
         print("Find {} cases".format(len(result)))
 
         return result
 
-    def eval_output(self, eval_inputs, s_data, fromdb, s_type, s_iteration, s_test_iteration):
-        if fromdb:
+    # Help model to adapt some situations.
+    def eval_load_model_base(self):
+        if self.adapter_weights != "None":
+            self.model = PeftModel.from_pretrained(
+                self.model,
+                self.adapter_weights,
+            )
+
+        if not self.load_8bit and self.device != "cpu":
+            self.model.half()
+
+
+        if self.load_8bit:
+            self.model.eval()
+        else:
+            self.model.to(self.device).eval()
+        if torch.__version__ >= "2" and sys.platform != "win32":
+            try:
+                self.model = torch.compile(self.model)
+            except:
+                print("Warning: torch.compile() failed, will skip it.")
+
+    # Format the output of the LLM.
+    def eval_output(self, eval_inputs):
+        if self.fromdb:
             data_set = []
             for item in eval_inputs:
-                data_set.append((item["payload_uuid"], s_type, item["instruction"], item["input"], item["output"],
-                                 item["ac_output"], s_iteration, s_test_iteration))
+                data_set.append((item["payload_uuid"], self.db_type, item["instruction"], item["input"], item["output"],
+                                 item["ac_output"], self.db_iteration, self.db_test_iteration))
 
             from common.db import get_mysql_conn
             conn = get_mysql_conn()
@@ -251,10 +483,33 @@ class LLM:
             conn.close()
 
             print("Finish eval!")
-        elif s_data:
+        elif self.test_data_path:
             case_cnt = 0
             for item in eval_inputs:
                 case_cnt += 1
                 print("[*] Case: {}\n--------\nExpect: \n{}\n----------------\nOutput: \n{}\n".format(case_cnt, item["output"], item["ac_output"]))
         else:
             print("LLM says: \n{}".format(eval_inputs[0]["ac_output"]))
+
+    # Format Inference main function.
+    def generate_base(self):
+        eval_inputs = self.get_eval_input()
+
+        for item in tqdm(eval_inputs):
+            try:
+                response = self.evaluate(item["instruction"], item["input"])
+                if response[-4:] == "</s>":
+                    response = response[:-4]
+                elif response[-15:] == "<|end_of_text|>":
+                    response = response[:-15]
+            except Exception as e:
+                if self.debug:
+                    print("[DEBUG] Error: " + str(e))
+                response = "Eval Error"
+
+            item["ac_output"] = response
+
+        if self.web:
+            return eval_inputs[0]["ac_output"]
+        else:
+            self.eval_output(eval_inputs)

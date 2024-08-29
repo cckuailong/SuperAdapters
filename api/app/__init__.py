@@ -4,7 +4,7 @@ from api.app.bp.api_v1 import v1_bp
 
 def create_app(llm):
     app = Flask(__name__)
-    app.config["model"] = llm.load_model()
+    llm.eval_load_model()
     app.config["llm"] = llm
 
     app.register_blueprint(v1_bp, url_prefix='/v1')
