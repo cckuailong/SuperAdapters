@@ -382,8 +382,8 @@ class LLM:
         if self.vllm:
             data = {
                 "model": self.base_model,
-                "max_tokens": 3,
-                "temperature": 0,
+                "max_tokens": self.max_new_tokens,
+                "temperature": self.temperature,
                 "prompt": prompt
             }
             resp = requests.post("http://localhost:8000/v1/completions", json=data)

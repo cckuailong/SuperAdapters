@@ -52,5 +52,5 @@ systemctl restart docker
 3. Start vllm Server
 
 ```
-docker run --runtime nvidia --gpus all -v /output/llama3.1-combined:/root/llama3.1-combined -p 8000:8000 --ipc=host vllm/vllm-openai:latest --model /root/llama3.1-combined --trust-remote-code
+docker run -d --runtime nvidia --gpus all -v /output/llama3.1-combined:/root/llama3.1-combined -p 8000:8000 --ipc=host vllm/vllm-openai:latest --model /root/llama3.1-combined --trust-remote-code
 ```
