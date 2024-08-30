@@ -535,6 +535,8 @@ class LLM:
         lora_model = PeftModel.from_pretrained(
             self.model,
             self.adapter_weights,
+            torch_dtype=torch.float16,
+            device_map=self.device_map
         )
 
         lora_model = lora_model.merge_and_unload()

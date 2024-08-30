@@ -186,8 +186,29 @@ class LLAMASeq2Seq(LLM):
         self.generate_base()
 
     def combine(self):
+        self.device = "cpu"
         self.auto_device()
-        self.model, self.tokenizer = self.get_model_tokenizer()
+        if self.model_type == "llama3":
+            self.model = AutoModelForCausalLM.from_pretrained(
+                self.base_model,
+                torch_dtype=torch.float16,
+                device_map=self.device_map
+            )
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.base_model,
+                add_eos_token=self.add_eos_token,
+                trust_remote_code=True
+            )
+        else:
+            self.model = LlamaForCausalLM.from_pretrained(
+                self.base_model,
+                device_map=self.device_map,
+                torch_dtype=torch.float16,
+            )
+            self.tokenizer = LlamaTokenizer.from_pretrained(
+                self.base_model,
+                add_eos_token=self.add_eos_token
+            )
         deloreanized_sd = self.combine_base()
         LlamaForCausalLM.save_pretrained(
             self.model, self.output_dir, state_dict=deloreanized_sd, max_shard_size=self.max_shard_size
