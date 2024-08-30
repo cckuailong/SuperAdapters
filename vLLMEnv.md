@@ -48,3 +48,5 @@ systemctl restart docker
 ```
 docker run -d --runtime nvidia --gpus all -v /root/SuperAdapters/output/llama3.1-combined:/root/SuperAdapters/output/llama3.1-combined -p 8000:8000 --ipc=host vllm/vllm-openai:latest --model /root/SuperAdapters/output/llama3.1-combined --trust-remote-code
 ```
+
+P.S. If you use V100, you should add option "--max_model_len", like "--max_model_len 30000" 
