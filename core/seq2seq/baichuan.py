@@ -150,6 +150,7 @@ class BaichuanSeq2Seq(LLM):
         self.generate_base()
 
     def combine(self):
+        self.device = "cpu"
         self.auto_device()
         self.model, self.tokenizer = self.get_model_tokenizer()
         deloreanized_sd = self.combine_base()
