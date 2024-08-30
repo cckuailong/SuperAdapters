@@ -186,6 +186,8 @@ class LLM:
             self.use_mps_device = True
             self.is_fp16 = False
             self.device_map = {"": self.device}
+        elif self.device == "cpu":
+            self.device_map = {"": self.device}
         else:
             if self.load_8bit:
                 self.is_fp16 = False
@@ -528,7 +530,7 @@ class LLM:
         else:
             self.eval_output(eval_inputs)
 
-    # -------------- Format Inference - ---------------
+    # -------------- Tool ---------------
     def combine_base(self):
         lora_model = PeftModel.from_pretrained(
             self.model,
