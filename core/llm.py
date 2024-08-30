@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import requests
 import torch
 import transformers
 from transformers import (
@@ -91,6 +92,7 @@ class LLM:
     top_p: float = 0.9
     top_k: int = 40
     max_new_tokens: int = 512
+    vllm: bool = False
     max_input: int = 0
 
     model = None
@@ -189,7 +191,7 @@ class LLM:
                 self.is_fp16 = False
             self.device_map = "auto"
 
-    # -------------- Inference ----------------
+    # -------------- Finetune ----------------
     #
     #
     # Generate the prompt to format the LLM input.
@@ -355,20 +357,20 @@ class LLM:
         if input:
             return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
 
-    ### Instruction:
-    {instruction}
+### Instruction:
+{instruction}
 
-    ### Input:
-    {input}
+### Input:
+{input}
 
-    ### Response:"""
+### Response:"""
         else:
             return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
-    ### Instruction:
-    {instruction}
+### Instruction:
+{instruction}
 
-    ### Response:"""
+### Response:"""
 
     # Inference main function.
     def evaluate(self,
@@ -377,30 +379,41 @@ class LLM:
                  **kwargs,
                  ):
         prompt = self.generate_eval_prompt(instruction, input)
-        inputs = self.tokenizer(prompt, return_tensors="pt")
-        input_ids = inputs["input_ids"].to(self.device)
-        generation_config = GenerationConfig(
-            temperature=self.temperature,
-            top_p=self.top_p,
-            top_k=self.top_k,
-            num_beams=4,
-            do_sample=True,
-            no_repeat_ngram_size=6,
-            repetition_penalty=1.8,
-            **kwargs,
-        )
-        with torch.no_grad():
-            generation_output = self.model.generate(
-                input_ids=input_ids,
-                generation_config=generation_config,
-                return_dict_in_generate=True,
-                output_scores=True,
-                max_new_tokens=self.max_new_tokens,
-            )
-        s = generation_output.sequences[0]
-        output = self.tokenizer.decode(s)
+        if self.vllm:
+            data = {
+                "model": self.base_model,
+                "max_tokens": 3,
+                "temperature": 0,
+                "prompt": prompt
+            }
+            resp = requests.post("http://localhost:8000/v1/completions", json=data)
 
-        return output.split("### Response:")[1].strip()
+            return resp.json()["choices"][0]["text"].strip()
+        else:
+            inputs = self.tokenizer(prompt, return_tensors="pt")
+            input_ids = inputs["input_ids"].to(self.device)
+            generation_config = GenerationConfig(
+                temperature=self.temperature,
+                top_p=self.top_p,
+                top_k=self.top_k,
+                num_beams=4,
+                do_sample=True,
+                no_repeat_ngram_size=6,
+                repetition_penalty=1.8,
+                **kwargs,
+            )
+            with torch.no_grad():
+                generation_output = self.model.generate(
+                    input_ids=input_ids,
+                    generation_config=generation_config,
+                    return_dict_in_generate=True,
+                    output_scores=True,
+                    max_new_tokens=self.max_new_tokens,
+                )
+            s = generation_output.sequences[0]
+            output = self.tokenizer.decode(s)
+
+            return output.split("### Response:")[1].strip()
 
     # -------------- Format Inference - ---------------
     # Get Input or the question.

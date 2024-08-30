@@ -149,7 +149,8 @@ class QwenSeq2Seq(LLM):
         self.eval_load_model_base()
 
     def generate(self):
-        self.eval_load_model()
+        if not self.vllm:
+            self.eval_load_model()
         self.generate_base()
 
     def combine(self):
