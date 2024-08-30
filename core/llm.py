@@ -381,7 +381,7 @@ class LLM:
         prompt = self.generate_eval_prompt(instruction, input)
         if self.vllm:
             data = {
-                "model": self.base_model,
+                "model": self.base_model[:-1] if self.base_model.endswith("/") else self.base_model,
                 "max_tokens": self.max_new_tokens,
                 "temperature": self.temperature,
                 "prompt": prompt

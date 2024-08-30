@@ -109,16 +109,6 @@ python finetune.py --model_type llama --data "data/train/" --model_path "LLMs/op
 python inference.py --model_type llama --instruction "Who are you?" --model_path "LLMs/open-llama/open-llama-3b" --adapter_weights "output/llama" --max_new_tokens 32
 ```
 
-### Bloom with lora
-
-```bash
-python finetune.py --model_type bloom --data "data/train/" --model_path "LLMs/bloom/bloomz-560m" --adapter "lora" --output_dir "output/bloom"
-```
-
-```bash
-python inference.py --model_type bloom --instruction "Who are you?" --model_path "LLMs/bloom/bloomz-560m" --adapter_weights "output/bloom" --max_new_tokens 32
-```
-
 ### Qwen with lora
 
 ```bash
@@ -129,35 +119,7 @@ python finetune.py --model_type qwen --data "data/train/" --model_path "LLMs/Qwe
 python inference.py --model_type qwen --instruction "Who are you?" --model_path "LLMs/Qwen/Qwen-7b-chat" --adapter_weights "output/Qwen" --max_new_tokens 32
 ```
 
-### Baichuan with lora
-
-```bash
-python finetune.py --model_type baichuan --data "data/train/" --model_path "LLMs/baichuan/baichuan-7b" --adapter "lora" --output_dir "output/baichuan"
-```
-
-```bash
-python inference.py --model_type baichuan --instruction "Who are you?" --model_path "LLMs/baichuan/baichuan-7b" --adapter_weights "output/baichuan" --max_new_tokens 32
-```
-
-### Mixtral with lora
-
-```bash
-python finetune.py --model_type mixtral --data "data/train/" --model_path "LLMs/mixtral/mixtral-7b" --adapter "lora" --output_dir "output/mixtral"
-```
-
-```bash
-python inference.py --model_type mixtral --instruction "Who are you?" --model_path "LLMs/mixtral/mixtral-7b" --adapter_weights "output/mixtral" --max_new_tokens 32
-```
-
-### Phi with lora
-
-```bash
-python finetune.py --model_type phi --data "data/train/" --model_path "LLMs/phi/phi-2" --adapter "lora" --output_dir "output/phi"
-```
-
-```bash
-python inference.py --model_type phi --instruction "Who are you?" --model_path "LLMs/phi/phi-2" --adapter_weights "output/phi" --max_new_tokens 32
-```
+Other LLMs are some usage of the above.
 
 ### Use Classify Mode
 
@@ -273,9 +235,10 @@ optional arguments:
 ## Generate
 
 ```shell
-usage: inference.py [-h] [--debug] [--web] [--api] [--instruction INSTRUCTION] [--input INPUT] [--data DATA] [--model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}]
-                    [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH] [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit] [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K]
-                    [--max_new_tokens MAX_NEW_TOKENS] [--fromdb] [--db_type DB_TYPE] [--db_iteration DB_ITERATION] [--db_test_iteration DB_TEST_ITERATION]
+usage: inference.py [-h] [--debug] [--web] [--api] [--instruction INSTRUCTION] [--input INPUT] [--max_input MAX_INPUT] [--test_data_path TEST_DATA_PATH]
+                    [--model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,phi3,gemma}] [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH]
+                    [--adapter_weights ADAPTER_WEIGHTS] [--load_8bit] [--temperature TEMPERATURE] [--top_p TOP_P] [--top_k TOP_K] [--max_new_tokens MAX_NEW_TOKENS] [--vllm] [--fromdb] [--db_type DB_TYPE]
+                    [--db_iteration DB_ITERATION] [--db_test_iteration DB_TEST_ITERATION] [--db_item_num DB_ITEM_NUM]
 
 Inference for all.
 
@@ -288,8 +251,9 @@ optional arguments:
   --input INPUT
   --max_input MAX_INPUT
                         Limit the input length to avoid OOM or other bugs
-  --test_data_path DATA           The DIR of test data
-  --model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}
+  --test_data_path TEST_DATA_PATH
+                        The DIR of test data
+  --model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,phi3,gemma}
   --task_type {seq2seq,classify}
   --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH
@@ -301,6 +265,7 @@ optional arguments:
   --top_p TOP_P
   --top_k TOP_K
   --max_new_tokens MAX_NEW_TOKENS
+  --vllm                Use vllm to accelerate inference.
   --fromdb
   --db_type DB_TYPE     The record is whether 'train' or 'test'.
   --db_iteration DB_ITERATION
@@ -309,6 +274,18 @@ optional arguments:
                         The record's test set name.
   --db_item_num DB_ITEM_NUM
                         The Limit Num of train/test items selected from DB.
+```
+
+**Use vllm:**
+
+1. Combine the Base Model and Adapter weight
+```
+python tool.py combine --model_type llama3 --model_path "LLMs/llama3.1/" --adapter_weights "output/llama3.1/" --output_dir "output/llama3.1-combined/"
+```
+2. Install the dependencies and start vllm server, [Help Link](./vLLMEnv.md).
+3. use option vllm
+```
+python inference.py --model_type llama3 --instruction "Who are you?" --model_path "/root/SuperAdapters/output/llama3.1-combined" --vllm --max_new_tokens 32
 ```
 
 ## Tool

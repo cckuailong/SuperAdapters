@@ -46,7 +46,7 @@ if __name__ == "__main__":
     parser.add_argument('--top_p', default="0.9", type=float)
     parser.add_argument('--top_k', default="40", type=int)
     parser.add_argument('--max_new_tokens', default="512", type=int)
-    parser.add_argument('--vllm', action="store_true")
+    parser.add_argument('--vllm', action="store_true", help="Use vllm to accelerate inference.")
 
     # fromdb
     parser.add_argument('--fromdb', action="store_true")

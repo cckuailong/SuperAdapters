@@ -1,11 +1,5 @@
 # Use vllm to accelerate inference
 
-## Combine the Base Model and Adapter weight
-
-```
-python tool.py combine --model_type llama3 --model_path "LLMs/llama3.1/" --adapter_weights "output/llama3.1/" --output_dir "output/llama3.1-combined/"
-```
-
 ## Start vllm server
 
 1. Open the "nvidia-runtime"
@@ -52,5 +46,5 @@ systemctl restart docker
 3. Start vllm Server
 
 ```
-docker run -d --runtime nvidia --gpus all -v /output/llama3.1-combined:/root/llama3.1-combined -p 8000:8000 --ipc=host vllm/vllm-openai:latest --model /root/llama3.1-combined --trust-remote-code
+docker run -d --runtime nvidia --gpus all -v /root/SuperAdapters/output/llama3.1-combined:/root/SuperAdapters/output/llama3.1-combined -p 8000:8000 --ipc=host vllm/vllm-openai:latest --model /root/SuperAdapters/output/llama3.1-combined --trust-remote-code
 ```
