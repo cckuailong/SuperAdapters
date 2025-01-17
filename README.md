@@ -180,20 +180,20 @@ python inference.py --model_type chatglm --fromdb --db_iteration xxxxxx --db_typ
 ### Finetune
 
 ```shell
-usage: finetune.py [-h] [--data DATA] [--model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}] [--task_type {seq2seq,classify}] [--labels LABELS] [--model_path MODEL_PATH]
-                   [--output_dir OUTPUT_DIR] [--disable_wandb] [--adapter {lora,qlora,adalora,prompt,p_tuning,prefix}] [--lora_r LORA_R] [--lora_alpha LORA_ALPHA] [--lora_dropout LORA_DROPOUT]
-                   [--lora_target_modules LORA_TARGET_MODULES [LORA_TARGET_MODULES ...]] [--adalora_init_r ADALORA_INIT_R] [--adalora_tinit ADALORA_TINIT] [--adalora_tfinal ADALORA_TFINAL]
-                   [--adalora_delta_t ADALORA_DELTA_T] [--num_virtual_tokens NUM_VIRTUAL_TOKENS] [--mapping_hidden_dim MAPPING_HIDDEN_DIM] [--epochs EPOCHS] [--learning_rate LEARNING_RATE]
-                   [--cutoff_len CUTOFF_LEN] [--val_set_size VAL_SET_SIZE] [--group_by_length] [--logging_steps LOGGING_STEPS] [--load_8bit] [--add_eos_token]
-                   [--resume_from_checkpoint [RESUME_FROM_CHECKPOINT]] [--per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE] [--gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS] [--fromdb]
-                   [--db_iteration DB_ITERATION]
+usage: finetune.py [-h] [--data DATA] [--model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,phi3,gemma}] [--task_type {seq2seq,classify}] [--labels LABELS]
+                   [--model_path MODEL_PATH] [--output_dir OUTPUT_DIR] [--disable_wandb] [--adapter {lora,qlora,adalora,prompt,p_tuning,prefix}] [--lora_r LORA_R] [--lora_alpha LORA_ALPHA]
+                   [--lora_dropout LORA_DROPOUT] [--lora_target_modules LORA_TARGET_MODULES [LORA_TARGET_MODULES ...]] [--adalora_init_r ADALORA_INIT_R] [--adalora_tinit ADALORA_TINIT]
+                   [--adalora_tfinal ADALORA_TFINAL] [--adalora_delta_t ADALORA_DELTA_T] [--num_virtual_tokens NUM_VIRTUAL_TOKENS] [--mapping_hidden_dim MAPPING_HIDDEN_DIM] [--epochs EPOCHS]
+                   [--learning_rate LEARNING_RATE] [--cutoff_len CUTOFF_LEN] [--val_set_size VAL_SET_SIZE] [--group_by_length] [--logging_steps LOGGING_STEPS] [--load_8bit] [--add_eos_token]
+                   [--resume_from_checkpoint [RESUME_FROM_CHECKPOINT]] [--per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE] [--gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS]
+                   [--weight_decay WEIGHT_DECAY] [--fromdb] [--db_iteration DB_ITERATION] [--db_item_num DB_ITEM_NUM]
 
 Finetune for all.
 
 optional arguments:
   -h, --help            show this help message and exit
   --data DATA           the data used for instructing tuning
-  --model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,gemma}
+  --model_type {llama,llama2,llama3,chatglm,chatglm2,bloom,qwen,baichuan,mixtral,phi,phi3,gemma}
   --task_type {seq2seq,classify}
   --labels LABELS       Labels to classify, only used when task_type is classify
   --model_path MODEL_PATH
@@ -228,6 +228,7 @@ optional arguments:
   --per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE
                         Batch size per GPU/CPU for training.
   --gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS
+  --weight_decay WEIGHT_DECAY
   --fromdb
   --db_iteration DB_ITERATION
                         The record's set name.

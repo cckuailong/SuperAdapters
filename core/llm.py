@@ -2,10 +2,12 @@ import os
 import sys
 import json
 import requests
+import copy
 import torch
 import transformers
 from transformers import (
     GenerationConfig,
+    DynamicCache,
 )
 from safetensors.torch import load_file
 from peft import (
@@ -76,6 +78,7 @@ class LLM:
     resume_from_checkpoint: str = None  # either training checkpoint or final adapter
     per_gpu_train_batch_size: int = 4
     gradient_accumulation_steps: int = 32
+    weight_decay: float = 0
 
     # auto set, user cannot control
     device: str = None
@@ -99,6 +102,8 @@ class LLM:
     tokenizer = None
     tokenize_prompt = None
     train_data_collator = None
+    prefix_pos = -1
+    prompt_cache = None
 
     fromdb = False
     db_type = ""
@@ -319,6 +324,7 @@ class LLM:
             save_steps=saving_step,
             # max_steps=200,
             output_dir=self.output_dir,
+            weight_decay=self.weight_decay,
             save_total_limit=11,
             load_best_model_at_end=True if self.val_set_size > 0 else False,
             ddp_find_unused_parameters=False if self.ddp else None,
@@ -392,6 +398,13 @@ class LLM:
 
             return resp.json()["choices"][0]["text"].strip()
         else:
+            if self.prefix_pos > 0 and not self.prompt_cache:
+                self.prompt_cache = DynamicCache()
+                prefix_inputs = self.tokenizer(prompt[:self.prefix_pos], return_tensors="pt").to(self.device)
+                prompt_cache = self.model(**prefix_inputs, past_key_values=self.prompt_cache).past_key_values
+                past_key_values = copy.deepcopy(prompt_cache)
+            else:
+                past_key_values = None
             inputs = self.tokenizer(prompt, return_tensors="pt")
             input_ids = inputs["input_ids"].to(self.device)
             generation_config = GenerationConfig(
@@ -411,6 +424,7 @@ class LLM:
                     return_dict_in_generate=True,
                     output_scores=True,
                     max_new_tokens=self.max_new_tokens,
+                    past_key_values=past_key_values,
                 )
             s = generation_output.sequences[0]
             output = self.tokenizer.decode(s)

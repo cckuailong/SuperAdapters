@@ -59,6 +59,7 @@ if __name__ == "__main__":
                         help='resume from the specified or the latest checkpoint, e.g. `--resume_from_checkpoint [path]` or `--resume_from_checkpoint`')
     parser.add_argument('--per_gpu_train_batch_size', default=4, type=int, help='Batch size per GPU/CPU for training.')
     parser.add_argument('--gradient_accumulation_steps', default=32, type=int)
+    parser.add_argument('--weight_decay', default=0, type=float)
 
     parser.add_argument('--fromdb', action="store_true")
     parser.add_argument('--db_iteration', default=None, type=str, help="The record's set name.")
@@ -147,6 +148,7 @@ if __name__ == "__main__":
     llm.resume_from_checkpoint = args.resume_from_checkpoint
     llm.per_gpu_train_batch_size = args.per_gpu_train_batch_size
     llm.gradient_accumulation_steps = args.gradient_accumulation_steps
+    llm.weight_decay = args.weight_decay
 
     llm.fromdb = args.fromdb
     llm.db_iteration = args.db_iteration
