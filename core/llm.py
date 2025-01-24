@@ -69,6 +69,7 @@ class LLM:
     # training hyperparams
     epochs: int = 3
     learning_rate: float = 3e-4
+    disable_warm_up: bool = False
     cutoff_len: int = 256
     val_set_size: float = 0.15
     group_by_length: bool = False,  # faster, but produces an odd training loss curve
@@ -308,11 +309,17 @@ class LLM:
         total_batch_size = self.per_gpu_train_batch_size * self.gradient_accumulation_steps * (self.world_size if self.ddp else 1)
         total_optim_steps = train_data.num_rows // total_batch_size
         saving_step = int(total_optim_steps / 10)
-        warmup_steps = int(total_optim_steps / 10)
+        if self.disable_warm_up:
+            warmup_steps = 0
+        else:
+            warmup_steps = int(total_optim_steps / 10)
+            if warmup_steps == 1:
+                warmup_steps = 2
+
         train_args = transformers.TrainingArguments(
             per_device_train_batch_size=self.per_gpu_train_batch_size,
             gradient_accumulation_steps=self.gradient_accumulation_steps,
-            warmup_steps=warmup_steps if warmup_steps != 1 else 2,
+            warmup_steps=warmup_steps,
             num_train_epochs=self.epochs,
             learning_rate=self.learning_rate,
             fp16=self.is_fp16,

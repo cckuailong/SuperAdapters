@@ -184,8 +184,8 @@ usage: finetune.py [-h] [--data DATA] [--model_type {llama,llama2,llama3,chatglm
                    [--model_path MODEL_PATH] [--output_dir OUTPUT_DIR] [--disable_wandb] [--adapter {lora,qlora,adalora,prompt,p_tuning,prefix}] [--lora_r LORA_R] [--lora_alpha LORA_ALPHA]
                    [--lora_dropout LORA_DROPOUT] [--lora_target_modules LORA_TARGET_MODULES [LORA_TARGET_MODULES ...]] [--adalora_init_r ADALORA_INIT_R] [--adalora_tinit ADALORA_TINIT]
                    [--adalora_tfinal ADALORA_TFINAL] [--adalora_delta_t ADALORA_DELTA_T] [--num_virtual_tokens NUM_VIRTUAL_TOKENS] [--mapping_hidden_dim MAPPING_HIDDEN_DIM] [--epochs EPOCHS]
-                   [--learning_rate LEARNING_RATE] [--cutoff_len CUTOFF_LEN] [--val_set_size VAL_SET_SIZE] [--group_by_length] [--logging_steps LOGGING_STEPS] [--load_8bit] [--add_eos_token]
-                   [--resume_from_checkpoint [RESUME_FROM_CHECKPOINT]] [--per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE] [--gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS]
+                   [--learning_rate LEARNING_RATE] [--disable_warm_up] [--cutoff_len CUTOFF_LEN] [--val_set_size VAL_SET_SIZE] [--group_by_length] [--logging_steps LOGGING_STEPS] [--load_8bit]
+                   [--add_eos_token] [--resume_from_checkpoint [RESUME_FROM_CHECKPOINT]] [--per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE] [--gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS]
                    [--weight_decay WEIGHT_DECAY] [--fromdb] [--db_iteration DB_ITERATION] [--db_item_num DB_ITEM_NUM]
 
 Finetune for all.
@@ -217,6 +217,7 @@ optional arguments:
   --mapping_hidden_dim MAPPING_HIDDEN_DIM
   --epochs EPOCHS
   --learning_rate LEARNING_RATE
+  --disable_warm_up
   --cutoff_len CUTOFF_LEN
   --val_set_size VAL_SET_SIZE
   --group_by_length

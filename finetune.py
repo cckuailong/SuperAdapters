@@ -48,6 +48,7 @@ if __name__ == "__main__":
     # train
     parser.add_argument('--epochs', default=3, type=int)
     parser.add_argument('--learning_rate', default=3e-4, type=float)
+    parser.add_argument('--disable_warm_up', action="store_true")
     parser.add_argument('--cutoff_len', default=512, type=int)
     parser.add_argument('--val_set_size', default=0.2, type=float)
     parser.add_argument('--group_by_length', action="store_true")
@@ -138,6 +139,7 @@ if __name__ == "__main__":
     llm.mapping_hidden_dim = args.mapping_hidden_dim
     llm.epochs = args.epochs
     llm.learning_rate = args.learning_rate
+    llm.disable_warm_up = args.disable_warm_up
     llm.cutoff_len = args.cutoff_len
     llm.val_set_size = args.val_set_size
     llm.group_by_length = args.group_by_length
