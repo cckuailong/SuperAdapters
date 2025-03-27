@@ -14,8 +14,6 @@ from transformers import (
     BitsAndBytesConfig
 )
 import importlib
-if importlib.util.find_spec('unsloth') is not None:
-    from unsloth import FastLanguageModel
 
 from core.llm import LLM
 
@@ -96,34 +94,6 @@ class LLAMASeq2Seq(LLM):
             tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
 
         return model, tokenizer
-
-    def get_model_tokenizer_unsloth(self):
-        model, tokenizer = FastLanguageModel.from_pretrained(
-            model_name=self.base_model,
-            max_seq_length=self.max_new_tokens,
-            dtype=None,
-            trust_remote_code=True,
-            load_in_4bit=True if self.adapter == "qlora" else False,
-        )
-        if self.adapter in ['lora', 'qlora']:
-            target_modules = find_all_linear_names(model, args.train_mode)
-            model = FastLanguageModel.get_peft_model(
-                model,
-                r=args.lora_rank,
-                target_modules=target_modules,
-                lora_alpha=args.lora_alpha,
-                lora_dropout=args.lora_dropout,
-                bias="none",
-                use_gradient_checkpointing=True,
-                random_state=training_args.seed,
-                max_seq_length=args.max_seq_length,
-            )
-            logger.info(f'target_modules: {target_modules}')
-        return {
-            'model': model,
-            'ref_model': None,
-            'peft_config': None
-        }
 
     def tokenize(self, prompt):
         result = self.tokenizer(
