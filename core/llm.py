@@ -421,7 +421,7 @@ class LLM:
             }
             resp = requests.post("http://localhost:8000/v1/completions", json=data)
 
-            return resp.json()["choices"][0]["text"].strip().strip("<|end_of_text|>").strip()
+            return resp.json()["choices"][0]["text"].strip().strip("<|end_of_text|>").strip()[0]
         else:
             if self.prefix_pos > 0 and not self.prompt_cache:
                 self.prompt_cache = DynamicCache()
@@ -454,7 +454,7 @@ class LLM:
             s = generation_output.sequences[0]
             output = self.tokenizer.decode(s)
 
-            return output.split("### Response:")[1].strip().strip("<|end_of_text|>").strip()
+            return output.split("### Response:")[1].strip().strip("<|end_of_text|>").strip()[0]
 
     # -------------- Format Inference - ---------------
     # Get Input or the question.
