@@ -12,9 +12,6 @@ from core.seq2seq.mixtral import MixtralSeq2Seq
 from core.seq2seq.phi import PhiSeq2Seq
 from core.seq2seq.gemma import GemmaSeq2Seq
 
-from core.classify.llama import LLAMAClassify
-from core.classify.bloom import BLoomClassify
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Finetune for all.')
@@ -22,7 +19,6 @@ if __name__ == "__main__":
     # base
     parser.add_argument('--data', type=str, default="data/train/", help='the data used for instructing tuning')
     parser.add_argument('--model_type', default="llama", choices=['llama', "llama2", 'llama3', 'chatglm', 'chatglm2', 'bloom', "qwen", "baichuan", "mixtral", "phi", "phi3", "gemma"])
-    parser.add_argument('--task_type', default="seq2seq", choices=['seq2seq', 'classify'])
     parser.add_argument('--labels', default="[\"0\", \"1\"]", help="Labels to classify, only used when task_type is classify")
     parser.add_argument('--model_path', default="LLMs/open-llama/openllama-3b", type=str)
     parser.add_argument('--output_dir', default="output/", type=str, help="The DIR to save the model")
@@ -68,52 +64,25 @@ if __name__ == "__main__":
 
     args, _ = parser.parse_known_args()
 
-    if args.task_type == "seq2seq":
-        if args.model_type == "chatglm" or args.model_type == "chatglm2":
-            llm = ChatGLMSeq2Seq()
-        elif args.model_type == "llama" or args.model_type == "llama2" or args.model_type == "llama3":
-            llm = LLAMASeq2Seq()
-        elif args.model_type == "bloom":
-            llm = BLoomSeq2Seq()
-        elif args.model_type == "qwen":
-            llm = QwenSeq2Seq()
-        elif args.model_type == "baichuan":
-            llm = BaichuanSeq2Seq()
-        elif args.model_type == "mixtral":
-            llm = MixtralSeq2Seq()
-        elif args.model_type == "phi" or args.model_type == "phi3":
-            llm = PhiSeq2Seq()
-        elif args.model_type == "gemma":
-            llm = GemmaSeq2Seq()
-        else:
-            print("model_type should be llama/llama2/llama3/bloom/chatglm/chatglm2/qwen/baichuan/mixtral/phi/phi3/gemma")
-            sys.exit(-1)
-    elif args.task_type == "classify":
-        if args.model_type == "chatglm" or args.model_type == "chatglm2":
-            print("Classify with ChatGLM is not support now.")
-            sys.exit(-1)
-        elif args.model_type == "llama" or args.model_type == "llama2" or args.model_type == "llama3":
-            llm = LLAMAClassify()
-        elif args.model_type == "bloom":
-            llm = BLoomClassify()
-        elif args.model_type == "qwen":
-            print("Classify with Qwen is not support now.")
-            sys.exit(-1)
-        elif args.model_type == "baichuan":
-            print("Classify with Baichuan is not support now.")
-            sys.exit(-1)
-        elif args.model_type == "mixtral":
-            print("Classify with Mixtral is not support now.")
-            sys.exit(-1)
-        elif args.model_type == "phi" or args.model_type == "phi3":
-            print("Classify with Phi/Phi3 is not support now.")
-            sys.exit(-1)
-        elif args.model_type == "gemma":
-            print("Classify with Gemma is not support now.")
-            sys.exit(-1)
-        else:
-            print("model_type should be llama/llama2/llama3/bloom/chatglm/chatglm2/qwen/baichuan/mixtral/phi/phi3/gemma")
-            sys.exit(-1)
+    if args.model_type == "chatglm" or args.model_type == "chatglm2":
+        llm = ChatGLMSeq2Seq()
+    elif args.model_type == "llama" or args.model_type == "llama2" or args.model_type == "llama3":
+        llm = LLAMASeq2Seq()
+    elif args.model_type == "bloom":
+        llm = BLoomSeq2Seq()
+    elif args.model_type == "qwen":
+        llm = QwenSeq2Seq()
+    elif args.model_type == "baichuan":
+        llm = BaichuanSeq2Seq()
+    elif args.model_type == "mixtral":
+        llm = MixtralSeq2Seq()
+    elif args.model_type == "phi" or args.model_type == "phi3":
+        llm = PhiSeq2Seq()
+    elif args.model_type == "gemma":
+        llm = GemmaSeq2Seq()
+    else:
+        print("model_type should be llama/llama2/llama3/bloom/chatglm/chatglm2/qwen/baichuan/mixtral/phi/phi3/gemma")
+        sys.exit(-1)
 
     llm.data_path = args.data
     llm.model_type = args.model_type

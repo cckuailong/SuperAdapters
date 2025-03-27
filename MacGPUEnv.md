@@ -12,6 +12,17 @@ xcode-select --install
 brew install llvm libomp
 ```
 
+Edit '/etc/profile' or 'zshrc'
+```
+export CC=/opt/homebrew/opt/llvm/bin/clang 
+export CXX=/opt/homebrew/opt/llvm/bin/clang++
+export LDFLAGS="-L/opt/homebrew/opt/libomp/lib" 
+export CPPFLAGS="-I/opt/homebrew/opt/libomp/include"
+```
+
+source '/etc/profile' or 'zshrc'
+
+
 3. Install PyTorch for M1/2
 
 *P.S. Please uninstall old PyTorch first.*

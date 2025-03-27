@@ -18,7 +18,7 @@ from peft import (
     LoraConfig,
     TaskType,
     get_peft_model,
-    prepare_model_for_int8_training,
+    prepare_model_for_kbit_training,
     set_peft_model_state_dict,
     PeftModel,
 )
@@ -199,6 +199,24 @@ class LLM:
                 self.is_fp16 = False
             self.device_map = "auto"
 
+    def find_all_linear_names(self, model, train_mode):
+        """
+        找出所有全连接层，为所有全连接添加adapter
+        """
+        assert train_mode in ['lora', 'qlora']
+        cls = bnb.nn.Linear4bit if train_mode == 'qlora' else nn.Linear
+        lora_module_names = set()
+        for name, module in model.named_modules():
+            if isinstance(module, cls):
+                names = name.split('.')
+                lora_module_names.add(names[0] if len(names) == 1 else names[-1])
+
+        if 'lm_head' in lora_module_names:  # needed for 16-bit
+            lora_module_names.remove('lm_head')
+        lora_module_names = list(lora_module_names)
+        print(f'LoRA target module names: {lora_module_names}')
+        return lora_module_names
+
     # -------------- Finetune ----------------
     #
     #
@@ -267,7 +285,7 @@ class LLM:
     # Finetune main function.
     def finetune_base(self):
         if self.load_8bit:
-            self.model = prepare_model_for_int8_training(self.model)
+            self.model = prepare_model_for_kbit_training(self.model)
 
         self.model = self.load_adapter_config(self.model)
 
@@ -403,7 +421,7 @@ class LLM:
             }
             resp = requests.post("http://localhost:8000/v1/completions", json=data)
 
-            return resp.json()["choices"][0]["text"].strip()
+            return resp.json()["choices"][0]["text"].strip().strip("<|end_of_text|>").strip()
         else:
             if self.prefix_pos > 0 and not self.prompt_cache:
                 self.prompt_cache = DynamicCache()
@@ -436,7 +454,7 @@ class LLM:
             s = generation_output.sequences[0]
             output = self.tokenizer.decode(s)
 
-            return output.split("### Response:")[1].strip()
+            return output.split("### Response:")[1].strip().strip("<|end_of_text|>").strip()
 
     # -------------- Format Inference - ---------------
     # Get Input or the question.
