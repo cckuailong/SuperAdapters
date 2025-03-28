@@ -33,7 +33,7 @@ def norm_flow(flow):
         first_line = '%0a'.join(tmp)
 
         # 提取请求头部
-        headers = ["Host: qwafdailyscan.lovebear.cloud:80"]
+        headers = ["Host: xxxxxx:80"]
         for line in request_lines[tmp_i:]:
             if line.strip() == '':
                 break
