@@ -182,7 +182,7 @@ class LLAMASeq2Seq(LLM):
         self.eval_load_model_base()
 
     def generate(self):
-        if not self.vllm:
+        if not self.vllm and not self.openai_api:
             self.eval_load_model()
         self.generate_base()
 
