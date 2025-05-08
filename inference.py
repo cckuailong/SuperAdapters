@@ -44,6 +44,7 @@ if __name__ == "__main__":
     parser.add_argument('--max_new_tokens', default="512", type=int)
     parser.add_argument('--prefix_pos', default='-1', type=int)
     parser.add_argument('--vllm', action="store_true", help="Use vllm to accelerate inference.")
+    parser.add_argument('--openai_api', action="store_true", help="Use openai-api style to inference.")
 
     # fromdb
     parser.add_argument('--fromdb', action="store_true")
@@ -89,6 +90,7 @@ if __name__ == "__main__":
     llm.max_new_tokens = args.max_new_tokens
     llm.prefix_pos = args.prefix_pos
     llm.vllm = args.vllm
+    llm.openai_api = args.openai_api
     llm.max_input = args.max_input
 
     llm.fromdb = args.fromdb

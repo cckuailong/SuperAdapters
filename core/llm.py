@@ -97,6 +97,7 @@ class LLM:
     top_k: int = 40
     max_new_tokens: int = 512
     vllm: bool = False
+    openai_api: bool = False
     max_input: int = 0
 
     model = None
@@ -422,6 +423,22 @@ class LLM:
             resp = requests.post("http://localhost:8000/v1/completions", json=data)
 
             return resp.json()["choices"][0]["text"].strip().strip("<|end_of_text|>").strip()[0]
+        elif self.openai_api:
+            data = {
+                "model": "inference",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                "temperature": self.temperature,
+                "max_tokens": self.max_new_tokens,
+                "stream": False
+            }
+            resp = requests.post("http://localhost:8000/v1/chat/completions", json=data)
+
+            return resp.json()["choices"][0]["message"]["content"].strip().strip("<|end_of_text|>").strip()[0]
         else:
             if self.prefix_pos > 0 and not self.prompt_cache:
                 self.prompt_cache = DynamicCache()
