@@ -61,7 +61,7 @@ if __name__ == "__main__":
         llm = LLAMASeq2Seq()
     elif args.model_type == "bloom":
         llm = BLoomSeq2Seq()
-    elif args.model_type == "qwen":
+    elif args.model_type == "qwen" or args.model_type == "qwen3":
         llm = QwenSeq2Seq()
     elif args.model_type == "baichuan":
         llm = BaichuanSeq2Seq()
