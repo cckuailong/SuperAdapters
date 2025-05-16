@@ -72,7 +72,7 @@ if __name__ == "__main__":
     elif args.model_type == "gemma":
         llm = GemmaSeq2Seq()
     else:
-        print("model_type should be llama/llama2/llama3/bloom/chatglm/chatglm2/qwen/baichuan/mixtral/phi/phi3/gemma")
+        print("model_type should be llama/llama2/llama3/bloom/chatglm/chatglm2/qwen/qwen3/baichuan/mixtral/phi/phi3/gemma")
         sys.exit(-1)
 
     llm.debug = args.debug
