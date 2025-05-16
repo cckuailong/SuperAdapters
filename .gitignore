@@ -16,6 +16,7 @@ LLMs/phi/
 LLMs/phi3/
 LLMs/InternLM/
 LLMs/Gemma/
+LLMs/Foundation-Sec-8B/
 output/bloom/
 output/chatglm/
 output/llama/

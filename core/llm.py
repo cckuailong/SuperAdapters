@@ -414,15 +414,33 @@ class LLM:
                  ):
         prompt = self.generate_eval_prompt(instruction, input)
         if self.vllm:
-            data = {
-                "model": self.base_model[:-1] if self.base_model.endswith("/") else self.base_model,
-                "max_tokens": self.max_new_tokens,
-                "temperature": self.temperature,
-                "prompt": prompt
-            }
-            resp = requests.post("http://localhost:8000/v1/completions", json=data)
+            if self.model_type == "qwen3":
+                data = {
+                    "model": self.base_model[:-1] if self.base_model.endswith("/") else self.base_model,
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ],
+                    "temperature": self.temperature,
+                    "max_tokens": self.max_new_tokens,
+                    "stream": False,
+                    "chat_template_kwargs": {"enable_thinking": False}
+                }
+                resp = requests.post("http://localhost:8000/v1/chat/completions", json=data)
 
-            return resp.json()["choices"][0]["text"].strip().strip("<|end_of_text|>").strip()[0]
+                return resp.json()["choices"][0]["message"]["content"].strip().strip("<|end_of_text|>").strip()[0]
+            else:
+                data = {
+                    "model": self.base_model[:-1] if self.base_model.endswith("/") else self.base_model,
+                    "max_tokens": self.max_new_tokens,
+                    "temperature": self.temperature,
+                    "prompt": prompt
+                }
+                resp = requests.post("http://localhost:8000/v1/completions", json=data)
+
+                return resp.json()["choices"][0]["text"].strip().strip("<|end_of_text|>").strip()[0]
         elif self.openai_api:
             data = {
                 "model": "inference",

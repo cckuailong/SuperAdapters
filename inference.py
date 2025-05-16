@@ -29,7 +29,7 @@ if __name__ == "__main__":
     parser.add_argument('--input', default=None, type=str)
     parser.add_argument('--max_input', default=None, type=int, help="Limit the input length to avoid OOM or other bugs")
     parser.add_argument('--test_data_path', default=None, help="The DIR of test data", type=str)
-    parser.add_argument('--model_type', default="llama", choices=['llama', 'llama2', 'llama3', 'chatglm', 'chatglm2', 'bloom', 'qwen', "baichuan", "mixtral", "phi", "phi3", "gemma"])
+    parser.add_argument('--model_type', default="llama", choices=['llama', 'llama2', 'llama3', 'chatglm', 'chatglm2', 'bloom', 'qwen', 'qwen3', "baichuan", "mixtral", "phi", "phi3", "gemma"])
     parser.add_argument('--labels', default="[\"0\", \"1\"]",
                         help="Labels to classify, only used when task_type is classify")
     parser.add_argument('--model_path', default="LLMs/open-llama/openllama-3b", type=str)
