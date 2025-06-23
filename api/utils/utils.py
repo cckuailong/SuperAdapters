@@ -3,7 +3,7 @@ import base64
 
 def norm_flow(flow):
     try:
-        request = base64.b64decode(flow).decode("utf-8")
+        request = base64.b64decode(flow).decode("utf-8", errors="replace")
         request = request.replace('\r\n', '\n')
         # 提取请求正文（如果存在）
         body_index = request.find('\n\n')
